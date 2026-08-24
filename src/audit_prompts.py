@@ -12,7 +12,10 @@ Checks (see docs/decision_log.md and docs/dataset_protocol.md purity check):
    byte-identical output.
 6. Split integrity — data/splits.json holds exactly the 30 expected pair_ids,
    20 train / 10 held_out, 4/2 per domain, and re-deriving the blake2b hash
-   procedure reproduces the committed file byte-for-byte.
+   procedure reproduces the committed file byte-for-byte. Also cross-checks
+   data/splits.json against data/prompts.jsonl: every split pair_id must appear
+   in the prompt corpus, no stray pair_id may exist in the corpus beyond the 30
+   in the split, and the train/held_out counts must be 20/10.
 
 This script does not test H1, H2, or H3. It is a data-quality gate: a failure here
 means the corpus is invalid and any downstream probe result would be
@@ -21,11 +24,11 @@ uninterpretable, not that a hypothesis has been confirmed or disconfirmed.
 Exit code 0 iff checks 1, 2, 3, 5, and 6 all pass. Rows with gold_answer=None are
 reported by count, not treated as a failure.
 
-Note: check 6 is intentionally self-contained. It does NOT cross-check
-data/splits.json against data/prompts.jsonl, because the split covers the future
-30-task ID space (code_*, text_*) while the pilot corpus still uses the original
-seed IDs (coding_001, writing_001). That cross-check belongs in the task-authoring
-step, once the seed file has been expanded and renamed to match.
+Note: the data/splits.json <-> data/prompts.jsonl cross-check (point 6 above) was
+deliberately deferred until the seed file's pair_id space matched the split (the
+pilot corpus used coding_001/writing_001 while the split already covered the
+30-task space of code_*/text_*). Now that data/controlled_tasks_seed.json has
+been expanded to the full 30 tasks, the cross-check is implemented below.
 """
 
 import hashlib
@@ -229,7 +232,7 @@ def serialize_split(rows: list[dict]) -> str:
     return json.dumps(rows, indent=2, ensure_ascii=False) + "\n"
 
 
-def check_split_integrity() -> list[str]:
+def check_split_integrity(prompt_pair_ids: set[str]) -> list[str]:
     failures = []
 
     if not SPLITS_PATH.exists():
@@ -301,6 +304,27 @@ def check_split_integrity() -> list[str]:
         failures.append(
             f"re-derived split is NOT byte-identical to {SPLITS_PATH} "
             f"(derived {len(derived_text)} bytes vs disk {len(disk_text)} bytes)"
+        )
+
+    # Cross-check against the actual prompt corpus (data/prompts.jsonl), not just
+    # the split file's own internal structure. splits.json can be internally
+    # consistent (30 correct ids, correct 20/10 fold counts) while still having
+    # drifted from the seed file the corpus was actually built from — e.g. a
+    # typo'd pair_id in data/controlled_tasks_seed.json, or a task dropped from
+    # the seed but left in the split. Both directions are checked so neither a
+    # missing task nor a stray one can pass silently.
+    split_ids = set(seen_ids)
+    missing_from_corpus = sorted(split_ids - prompt_pair_ids)
+    if missing_from_corpus:
+        failures.append(
+            f"pair_id(s) in {SPLITS_PATH.name} but missing from {OUTPUT_PATH.name}: "
+            f"{missing_from_corpus}"
+        )
+    stray_in_corpus = sorted(prompt_pair_ids - split_ids)
+    if stray_in_corpus:
+        failures.append(
+            f"pair_id(s) in {OUTPUT_PATH.name} but not present in {SPLITS_PATH.name}: "
+            f"{stray_in_corpus}"
         )
 
     return failures
@@ -382,7 +406,8 @@ def main() -> int:
     coverage_failures = check_condition_coverage(disk_rows)
     leakage_failures = check_leakage(disk_rows)
     parity_failures = check_length_parity(disk_rows)
-    split_failures = check_split_integrity()
+    prompt_pair_ids = {row["pair_id"] for row in disk_rows}
+    split_failures = check_split_integrity(prompt_pair_ids)
     report_token_length_stats(disk_rows)
     report_null_gold_answers(disk_rows)
     report_split_summary()
@@ -413,7 +438,8 @@ def main() -> int:
         f"\n=== Split integrity ({len(SPLIT_DOMAINS) * TASKS_PER_DOMAIN} ids, "
         f"{len(SPLIT_DOMAINS) * TRAIN_PER_DOMAIN} train / "
         f"{len(SPLIT_DOMAINS) * HELD_OUT_PER_DOMAIN} held_out, "
-        f"{TRAIN_PER_DOMAIN}/{HELD_OUT_PER_DOMAIN} per domain, blake2b re-derived) ==="
+        f"{TRAIN_PER_DOMAIN}/{HELD_OUT_PER_DOMAIN} per domain, blake2b re-derived, "
+        f"cross-checked against {OUTPUT_PATH.name}) ==="
     )
     if split_failures:
         for f in split_failures:
