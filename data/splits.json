@@ -1,0 +1,182 @@
+[
+  {
+    "pair_id": "arith_001",
+    "domain": "arith",
+    "fold": "train",
+    "hash_hex": "4be9063f193a96b7"
+  },
+  {
+    "pair_id": "arith_002",
+    "domain": "arith",
+    "fold": "train",
+    "hash_hex": "6203c4150f06ddc1"
+  },
+  {
+    "pair_id": "arith_003",
+    "domain": "arith",
+    "fold": "held_out",
+    "hash_hex": "ac2a6ed14c0e3a5a"
+  },
+  {
+    "pair_id": "arith_004",
+    "domain": "arith",
+    "fold": "train",
+    "hash_hex": "9c789c8b2dde210a"
+  },
+  {
+    "pair_id": "arith_005",
+    "domain": "arith",
+    "fold": "held_out",
+    "hash_hex": "dd68965441ee6053"
+  },
+  {
+    "pair_id": "arith_006",
+    "domain": "arith",
+    "fold": "train",
+    "hash_hex": "7de1ec6ba9fbd1d7"
+  },
+  {
+    "pair_id": "code_001",
+    "domain": "code",
+    "fold": "held_out",
+    "hash_hex": "e4ab7e6cf18fa014"
+  },
+  {
+    "pair_id": "code_002",
+    "domain": "code",
+    "fold": "held_out",
+    "hash_hex": "cd33c66215cb4c53"
+  },
+  {
+    "pair_id": "code_003",
+    "domain": "code",
+    "fold": "train",
+    "hash_hex": "c1870324eaa98ec2"
+  },
+  {
+    "pair_id": "code_004",
+    "domain": "code",
+    "fold": "train",
+    "hash_hex": "07c1c171126febf7"
+  },
+  {
+    "pair_id": "code_005",
+    "domain": "code",
+    "fold": "train",
+    "hash_hex": "7e43c63e543d6e1d"
+  },
+  {
+    "pair_id": "code_006",
+    "domain": "code",
+    "fold": "train",
+    "hash_hex": "528b2da341149d63"
+  },
+  {
+    "pair_id": "logic_001",
+    "domain": "logic",
+    "fold": "train",
+    "hash_hex": "41a8e9ad0915e295"
+  },
+  {
+    "pair_id": "logic_002",
+    "domain": "logic",
+    "fold": "train",
+    "hash_hex": "1d3abd0260bb58c7"
+  },
+  {
+    "pair_id": "logic_003",
+    "domain": "logic",
+    "fold": "held_out",
+    "hash_hex": "88612133d4e968dc"
+  },
+  {
+    "pair_id": "logic_004",
+    "domain": "logic",
+    "fold": "held_out",
+    "hash_hex": "7c75982f89a78ad5"
+  },
+  {
+    "pair_id": "logic_005",
+    "domain": "logic",
+    "fold": "train",
+    "hash_hex": "417437b798bd18ce"
+  },
+  {
+    "pair_id": "logic_006",
+    "domain": "logic",
+    "fold": "train",
+    "hash_hex": "5dc14919e0152858"
+  },
+  {
+    "pair_id": "fact_001",
+    "domain": "fact",
+    "fold": "held_out",
+    "hash_hex": "dd254eb45a76ae10"
+  },
+  {
+    "pair_id": "fact_002",
+    "domain": "fact",
+    "fold": "train",
+    "hash_hex": "22ffe35db4c24c5f"
+  },
+  {
+    "pair_id": "fact_003",
+    "domain": "fact",
+    "fold": "train",
+    "hash_hex": "33ea719e593ebdcd"
+  },
+  {
+    "pair_id": "fact_004",
+    "domain": "fact",
+    "fold": "train",
+    "hash_hex": "9290fd663c5a908a"
+  },
+  {
+    "pair_id": "fact_005",
+    "domain": "fact",
+    "fold": "held_out",
+    "hash_hex": "d53fe706661c7087"
+  },
+  {
+    "pair_id": "fact_006",
+    "domain": "fact",
+    "fold": "train",
+    "hash_hex": "14df61196af858cd"
+  },
+  {
+    "pair_id": "text_001",
+    "domain": "text",
+    "fold": "held_out",
+    "hash_hex": "b24f083621af3da8"
+  },
+  {
+    "pair_id": "text_002",
+    "domain": "text",
+    "fold": "train",
+    "hash_hex": "1acdabb50c9789f7"
+  },
+  {
+    "pair_id": "text_003",
+    "domain": "text",
+    "fold": "train",
+    "hash_hex": "841e283935f0401b"
+  },
+  {
+    "pair_id": "text_004",
+    "domain": "text",
+    "fold": "held_out",
+    "hash_hex": "c1add6c7a22574ad"
+  },
+  {
+    "pair_id": "text_005",
+    "domain": "text",
+    "fold": "train",
+    "hash_hex": "6de323e988a75d7d"
+  },
+  {
+    "pair_id": "text_006",
+    "domain": "text",
+    "fold": "train",
+    "hash_hex": "268cf2b96168a1f4"
+  }
+]

@@ -8,15 +8,25 @@ Checks (see docs/decision_log.md and docs/dataset_protocol.md purity check):
 4. Token-length statistics — reported alongside the parity check, for visibility.
 5. Byte-identical rerun — rebuilding the corpus twice (and against disk) produces
    byte-identical output.
+6. Split integrity — data/splits.json holds exactly the 30 expected pair_ids,
+   20 train / 10 held_out, 4/2 per domain, and re-deriving the blake2b hash
+   procedure reproduces the committed file byte-for-byte.
 
 This script does not test H1, H2, or H3. It is a data-quality gate: a failure here
 means the corpus is invalid and any downstream probe result would be
 uninterpretable, not that a hypothesis has been confirmed or disconfirmed.
 
-Exit code 0 iff checks 1, 2, 3, and 5 all pass. Rows with gold_answer=None are
+Exit code 0 iff checks 1, 2, 3, 5, and 6 all pass. Rows with gold_answer=None are
 reported by count, not treated as a failure.
+
+Note: check 6 is intentionally self-contained. It does NOT cross-check
+data/splits.json against data/prompts.jsonl, because the split covers the future
+30-task ID space (code_*, text_*) while the pilot corpus still uses the original
+seed IDs (coding_001, writing_001). That cross-check belongs in the task-authoring
+step, once the seed file has been expanded and renamed to match.
 """
 
+import hashlib
 import json
 import re
 import statistics
@@ -26,6 +36,7 @@ from build_prompts import (
     CONDITIONS,
     LANGUAGES,
     OUTPUT_PATH,
+    REPO_ROOT,
     TASKS_PATH,
     TOKENIZER_NAME,
     build_rows,
@@ -36,6 +47,19 @@ from build_prompts import (
 from transformers import AutoTokenizer
 
 DEPLOYMENT_CONDITIONS = {"deploy_plain", "deploy_framed"}
+
+# --- Locked 30-task train/held-out split (docs/decision_log.md) ---------------
+# The split is fixed by hashing pair_ids BEFORE any task text is authored, so
+# item difficulty / test-likeness cannot be steered into a fold. blake2b (not
+# Python's built-in hash(), which is per-process salted) so the assignment is
+# reproducible across processes, Python versions, and platforms, and so a human
+# can recompute any single row by hand from hash_hex (CLAUDE.md rule 8).
+SPLITS_PATH = REPO_ROOT / "data" / "splits.json"
+SPLIT_DOMAINS = ["arith", "code", "logic", "fact", "text"]
+TASKS_PER_DOMAIN = 6
+TRAIN_PER_DOMAIN = 4
+HELD_OUT_PER_DOMAIN = 2
+SPLIT_FOLDS = ("train", "held_out")
 
 # Per-pair, per-language length-parity gate. Anchored to deploy_plain (the null
 # condition) rather than the four-condition mean, and checked per pair rather
@@ -135,6 +159,138 @@ def check_length_parity(rows: list[dict]) -> list[str]:
     return failures
 
 
+def split_hash(pair_id: str) -> tuple[int, str]:
+    """Return (sort_key, hash_hex) for one pair_id under the locked procedure."""
+    digest = hashlib.blake2b(pair_id.encode("utf-8"), digest_size=8).digest()
+    return int.from_bytes(digest, "big"), digest.hex()
+
+
+def derive_split() -> list[dict]:
+    """Re-derive the 30-task split from pair_ids alone.
+
+    Within each domain: sort the 6 ids ascending by their blake2b integer, first
+    4 -> train, last 2 -> held_out. Rows are emitted in (domain order, id order)
+    rather than hash order, so the file is readable; the fold assignment itself
+    comes only from the hash ranking.
+    """
+    rows = []
+    for domain in SPLIT_DOMAINS:
+        pair_ids = [f"{domain}_{i:03d}" for i in range(1, TASKS_PER_DOMAIN + 1)]
+        ranked = sorted(pair_ids, key=lambda pid: split_hash(pid)[0])
+        fold_of = {
+            pid: ("train" if rank < TRAIN_PER_DOMAIN else "held_out")
+            for rank, pid in enumerate(ranked)
+        }
+        for pair_id in pair_ids:
+            rows.append(
+                {
+                    "pair_id": pair_id,
+                    "domain": domain,
+                    "fold": fold_of[pair_id],
+                    "hash_hex": split_hash(pair_id)[1],
+                }
+            )
+    return rows
+
+
+def serialize_split(rows: list[dict]) -> str:
+    """Canonical on-disk form of data/splits.json (key order fixed by derive_split)."""
+    return json.dumps(rows, indent=2, ensure_ascii=False) + "\n"
+
+
+def check_split_integrity() -> list[str]:
+    failures = []
+
+    if not SPLITS_PATH.exists():
+        return [f"{SPLITS_PATH} does not exist"]
+
+    disk_text = SPLITS_PATH.read_text(encoding="utf-8")
+    try:
+        disk_rows = json.loads(disk_text)
+    except json.JSONDecodeError as exc:
+        return [f"{SPLITS_PATH} is not valid JSON: {exc}"]
+
+    if not isinstance(disk_rows, list):
+        return [f"{SPLITS_PATH} must be a JSON list, got {type(disk_rows).__name__}"]
+
+    expected_total = len(SPLIT_DOMAINS) * TASKS_PER_DOMAIN
+    if len(disk_rows) != expected_total:
+        failures.append(f"expected {expected_total} rows, found {len(disk_rows)}")
+
+    # Structural checks run against the committed file, not the re-derivation, so
+    # a hand-edited file fails here rather than only on the byte comparison.
+    required_keys = {"pair_id", "domain", "fold", "hash_hex"}
+    seen_ids = []
+    for i, row in enumerate(disk_rows):
+        if not isinstance(row, dict) or set(row) != required_keys:
+            failures.append(f"row {i}: keys {sorted(row) if isinstance(row, dict) else row!r} != {sorted(required_keys)}")
+            continue
+        seen_ids.append(row["pair_id"])
+        if row["fold"] not in SPLIT_FOLDS:
+            failures.append(f"{row['pair_id']}: fold {row['fold']!r} not in {SPLIT_FOLDS}")
+        if row["domain"] not in SPLIT_DOMAINS:
+            failures.append(f"{row['pair_id']}: domain {row['domain']!r} not in {SPLIT_DOMAINS}")
+
+    duplicates = sorted({pid for pid in seen_ids if seen_ids.count(pid) > 1})
+    if duplicates:
+        failures.append(f"duplicate pair_ids: {duplicates}")
+
+    expected_ids = {row["pair_id"] for row in derive_split()}
+    missing = sorted(expected_ids - set(seen_ids))
+    unexpected = sorted(set(seen_ids) - expected_ids)
+    if missing:
+        failures.append(f"missing pair_ids: {missing}")
+    if unexpected:
+        failures.append(f"unexpected pair_ids: {unexpected}")
+
+    fold_counts = {fold: sum(1 for r in disk_rows if r.get("fold") == fold) for fold in SPLIT_FOLDS}
+    expected_train = len(SPLIT_DOMAINS) * TRAIN_PER_DOMAIN
+    expected_held_out = len(SPLIT_DOMAINS) * HELD_OUT_PER_DOMAIN
+    if fold_counts["train"] != expected_train:
+        failures.append(f"expected {expected_train} train rows, found {fold_counts['train']}")
+    if fold_counts["held_out"] != expected_held_out:
+        failures.append(f"expected {expected_held_out} held_out rows, found {fold_counts['held_out']}")
+
+    for domain in SPLIT_DOMAINS:
+        domain_rows = [r for r in disk_rows if r.get("domain") == domain]
+        n_train = sum(1 for r in domain_rows if r.get("fold") == "train")
+        n_held_out = sum(1 for r in domain_rows if r.get("fold") == "held_out")
+        if (n_train, n_held_out) != (TRAIN_PER_DOMAIN, HELD_OUT_PER_DOMAIN):
+            failures.append(
+                f"{domain}: expected {TRAIN_PER_DOMAIN} train / {HELD_OUT_PER_DOMAIN} held_out, "
+                f"found {n_train} train / {n_held_out} held_out"
+            )
+
+    # Byte-for-byte re-derivation. This detects hand-editing, ID drift, and any
+    # divergence between the committed file and the procedure that produced it.
+    # It does not, and cannot, verify that the procedure itself is the intended
+    # one — that is what the locked spec in docs/decision_log.md is for.
+    derived_text = serialize_split(derive_split())
+    if derived_text != disk_text:
+        failures.append(
+            f"re-derived split is NOT byte-identical to {SPLITS_PATH} "
+            f"(derived {len(derived_text)} bytes vs disk {len(disk_text)} bytes)"
+        )
+
+    return failures
+
+
+def report_split_summary() -> None:
+    if not SPLITS_PATH.exists():
+        return
+    try:
+        rows = json.loads(SPLITS_PATH.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return
+    if not isinstance(rows, list):
+        return
+    print(f"\nLocked split ({SPLITS_PATH.name}), fold assignment by domain:")
+    for domain in SPLIT_DOMAINS:
+        train = sorted(r["pair_id"] for r in rows if r.get("domain") == domain and r.get("fold") == "train")
+        held = sorted(r["pair_id"] for r in rows if r.get("domain") == domain and r.get("fold") == "held_out")
+        print(f"  {domain:>6}: train={train} held_out={held}")
+
+
 def report_token_length_stats(rows: list[dict]) -> None:
     all_lengths = [r["n_tokens"] for r in rows]
     print("\nToken-length statistics (n_tokens = full rendered chat-template string):")
@@ -195,8 +351,10 @@ def main() -> int:
     coverage_failures = check_condition_coverage(disk_rows)
     leakage_failures = check_leakage(disk_rows)
     parity_failures = check_length_parity(disk_rows)
+    split_failures = check_split_integrity()
     report_token_length_stats(disk_rows)
     report_null_gold_answers(disk_rows)
+    report_split_summary()
     rerun_failures = check_byte_identical_rerun(disk_rows)
 
     print("\n=== Condition coverage ===")
@@ -220,6 +378,18 @@ def main() -> int:
     else:
         print("  OK")
 
+    print(
+        f"\n=== Split integrity ({len(SPLIT_DOMAINS) * TASKS_PER_DOMAIN} ids, "
+        f"{len(SPLIT_DOMAINS) * TRAIN_PER_DOMAIN} train / "
+        f"{len(SPLIT_DOMAINS) * HELD_OUT_PER_DOMAIN} held_out, "
+        f"{TRAIN_PER_DOMAIN}/{HELD_OUT_PER_DOMAIN} per domain, blake2b re-derived) ==="
+    )
+    if split_failures:
+        for f in split_failures:
+            print(f"  FAIL: {f}")
+    else:
+        print("  OK")
+
     print("\n=== Byte-identical rerun ===")
     if rerun_failures:
         for f in rerun_failures:
@@ -227,7 +397,9 @@ def main() -> int:
     else:
         print("  OK")
 
-    all_failures = coverage_failures + leakage_failures + parity_failures + rerun_failures
+    all_failures = (
+        coverage_failures + leakage_failures + parity_failures + split_failures + rerun_failures
+    )
     if all_failures:
         print(f"\nAUDIT FAILED: {len(all_failures)} failure(s)")
         return 1
