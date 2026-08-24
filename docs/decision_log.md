@@ -54,3 +54,9 @@ The formal timer will begin only after:
 2. The model/tooling path is working reliably.
 3. The project’s train/test split, activation extraction position, and primary metrics are locked.
 
+
+## 2026-08-24 — Qwen model-load feasibility
+
+`Qwen/Qwen2.5-7B-Instruct` successfully loaded on the RTX 4090 in bfloat16 using Hugging Face Transformers and `device_map="cuda"`.
+
+No activations, probes, steering vectors, generations, or experimental metrics were collected in this check. This was infrastructure validation only.
