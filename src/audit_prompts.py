@@ -2,7 +2,9 @@
 
 Checks (see docs/decision_log.md and docs/dataset_protocol.md purity check):
 1. Condition coverage — every (pair_id, language) has exactly the 4 conditions.
-2. Eval-marker leakage — no benchmark/eval vocabulary in deploy_plain/deploy_framed.
+2. Eval-marker leakage — no benchmark/eval vocabulary in deploy_plain/deploy_framed,
+   checked against that row's own language's banned-word list (BANNED_WORDS_BY_LANGUAGE).
+   A row whose language has no list yet is a hard failure, not a skipped check.
 3. Length parity — per (pair_id, language), every condition's n_tokens is within
    LENGTH_TOLERANCE of that pair's deploy_plain n_tokens (the null-condition anchor).
 4. Token-length statistics — reported alongside the parity check, for visibility.
@@ -69,20 +71,33 @@ SPLIT_FOLDS = ("train", "held_out")
 # approximate token length").
 LENGTH_TOLERANCE = 0.15
 
-BANNED_WORDS = [
-    "test", "tested", "testing",
-    "evaluate", "evaluated", "evaluation", "evaluating",
-    "benchmark", "benchmarked",
-    "grade", "graded", "grading",
-    "score", "scored", "scoring",
-    "assess", "assessment",
-    "exam", "examination",
-    "quiz",
-]
-BANNED_PATTERN = re.compile(
-    r"\b(" + "|".join(re.escape(w) for w in BANNED_WORDS) + r")\b",
-    re.IGNORECASE,
-)
+# Per-language banned-word lists for the eval-marker leakage check. Only "en" is
+# populated today (the corpus is English-only). Add "zh"/"ar"/"yo" entries here
+# — each a native list, not a machine translation of the English one, since a
+# translated list is produced by the same process being audited and cannot
+# catch a mistranslation of its own terms — before build_prompts.py emits any
+# row in that language. check_leakage() below fails loudly (a reported failure,
+# not a silent skip) for any language it encounters with no entry here, so a
+# missing list cannot pass the audit by omission.
+BANNED_WORDS_BY_LANGUAGE = {
+    "en": [
+        "test", "tested", "testing",
+        "evaluate", "evaluated", "evaluation", "evaluating",
+        "benchmark", "benchmarked",
+        "grade", "graded", "grading",
+        "score", "scored", "scoring",
+        "assess", "assessment",
+        "exam", "examination",
+        "quiz",
+    ],
+}
+BANNED_PATTERNS = {
+    language: re.compile(
+        r"\b(" + "|".join(re.escape(w) for w in words) + r")\b",
+        re.IGNORECASE,
+    )
+    for language, words in BANNED_WORDS_BY_LANGUAGE.items()
+}
 
 
 def load_disk_rows() -> list[dict]:
@@ -125,15 +140,31 @@ def check_condition_coverage(rows: list[dict]) -> list[str]:
 
 def check_leakage(rows: list[dict]) -> list[str]:
     failures = []
+    languages_missing_list = {}
     for row in rows:
         if row["condition"] not in DEPLOYMENT_CONDITIONS:
             continue
-        match = BANNED_PATTERN.search(row["user_text"])
+        language = row["language"]
+        pattern = BANNED_PATTERNS.get(language)
+        if pattern is None:
+            languages_missing_list.setdefault(language, set()).add(row["pair_id"])
+            continue
+        match = pattern.search(row["user_text"])
         if match:
             failures.append(
-                f"{row['pair_id']}/{row['language']}/{row['condition']}: "
+                f"{row['pair_id']}/{language}/{row['condition']}: "
                 f"banned word {match.group(0)!r} found in user_text: {row['user_text']!r}"
             )
+
+    # A missing list is reported as its own hard failure — never treated as "no
+    # match found" — so a new language cannot pass this check by omission.
+    for language, pair_ids in sorted(languages_missing_list.items()):
+        failures.append(
+            f"language {language!r}: no entry in BANNED_WORDS_BY_LANGUAGE, cannot check "
+            f"leakage for {len(pair_ids)} pair_id(s) ({sorted(pair_ids)}) — add a native "
+            f"banned-word list for this language before auditing it"
+        )
+
     return failures
 
 
