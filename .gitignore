@@ -5,3 +5,28 @@ outputs/activations/*.pt
 outputs/activations/*.npy
 *.env
 .DS_Store
+.aider*
+
+# Secrets and local environment
+.env
+.env.*
+*.key
+*.pem
+
+# Hugging Face / model caches
+.cache/
+huggingface/
+hf_cache/
+
+# Downloaded data and large experimental artifacts
+data/*/raw/
+data/*/processed/
+outputs/activations/
+outputs/probes/
+outputs/results/
+outputs/transcripts/
+
+# Python / notebooks
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
