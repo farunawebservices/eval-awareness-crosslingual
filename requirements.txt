@@ -1,0 +1,12 @@
+torch>=2.2
+transformer_lens
+nnsight
+transformers>=4.44
+accelerate
+scikit-learn
+pandas
+numpy
+matplotlib
+datasets
+huggingface_hub
+jupyterlab

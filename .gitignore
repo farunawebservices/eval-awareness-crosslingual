@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+outputs/activations/*.pt
+outputs/activations/*.npy
+*.env
+.DS_Store
