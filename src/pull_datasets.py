@@ -3,57 +3,76 @@ Pull verified dataset sources for the cross-lingual eval-awareness project.
 Run this first, inside the persistent Jupyter/ipython session on the GPU instance.
 
 Fix log:
-- CMMLU: datasets>=4.0.0 (July 2025) REMOVED loading-script support entirely.
-  Every repo still shipping a cmmlu.py script (haonan-li/cmmlu, lmlmcat/cmmlu,
-  and most other mirrors) will raise 'Dataset scripts are no longer supported'
-  no matter which mirror you pick. Fix: bypass load_dataset() for CMMLU and
-  pull the raw per-subject CSVs directly from the HF repo via hf_hub_download
-  or pandas.read_csv against the resolve URL. This sidesteps the script issue
-  completely since we never invoke the builder.
-- ArabicMMLU: config name is 'All' (capital A), not 'all'. This one DOES use
-  a parquet-native repo so load_dataset works fine once the config name is right.
+- CMMLU: datasets>=4.0.0 removed loading-script support entirely, so
+  load_dataset('haonan-li/cmmlu', ...) fails no matter which mirror is used.
+  The actual repo (verified via the HF file browser) ships the whole dataset
+  as a single archive, cmmlu_v1_0_1.zip, NOT loose CSVs at the repo root.
+  Fix: download that zip with hf_hub_download, extract it locally, then read
+  the per-subject CSVs from the extracted folder with pandas. This never
+  touches the removed builder mechanism.
+- ArabicMMLU: config name is 'All' (capital A), not 'all'. This repo is
+  parquet-native so load_dataset works fine once the config name is right.
 """
+import os
+import zipfile
 import pandas as pd
-from huggingface_hub import list_repo_files, hf_hub_download
+from huggingface_hub import hf_hub_download
 from datasets import load_dataset
 
-def pull_cmmlu(subject=None):
+CACHE_DIR = os.path.expanduser("~/.cache/eval_awareness_data")
+
+def pull_cmmlu(subject=None, split="test"):
     """
-    Loads CMMLU by reading raw CSVs directly, avoiding load_dataset() entirely.
-    CMMLU's original repo structure has per-subject CSVs under test/ (and
-    dev/few-shot examples under dev/). If subject is None, concatenates all
-    available test CSVs into one dataframe with a 'subject' column.
+    CMMLU ships as a single zip archive on the Hub. Download + extract it
+    once, then read whichever split's CSVs are inside.
     """
-    repo_id = "haonan-li/cmmlu"
-    files = list_repo_files(repo_id, repo_type="dataset")
-    test_csvs = [f for f in files if f.startswith("test/") and f.endswith(".csv")]
-    if not test_csvs:
+    os.makedirs(CACHE_DIR, exist_ok=True)
+    zip_path = hf_hub_download(
+        "haonan-li/cmmlu", "cmmlu_v1_0_1.zip", repo_type="dataset"
+    )
+    extract_dir = os.path.join(CACHE_DIR, "cmmlu_v1_0_1")
+    if not os.path.exists(extract_dir):
+        with zipfile.ZipFile(zip_path, "r") as zf:
+            zf.extractall(extract_dir)
+
+    # Walk the extracted tree and print it once so we can SEE the real layout
+    # instead of assuming it — CMMLU's internal folder structure has varied
+    # across versions (some releases nest an extra 'cmmlu' folder).
+    found_csvs = []
+    for root, _, files in os.walk(extract_dir):
+        for fn in files:
+            if fn.endswith(".csv") and split in root.lower():
+                found_csvs.append(os.path.join(root, fn))
+
+    if not found_csvs:
+        print("DEBUG: no CSVs matched split filter, dumping full extracted tree:")
+        for root, _, files in os.walk(extract_dir):
+            for fn in files:
+                print(os.path.join(root, fn))
         raise RuntimeError(
-            f"No test/*.csv files found in {repo_id}. Repo layout may have "
-            f"changed — run list_repo_files('{repo_id}', repo_type='dataset') "
-            f"yourself and inspect the actual paths before assuming this structure."
+            f"No CSVs found under an implied '{split}' folder inside the "
+            f"extracted CMMLU zip. See the DEBUG tree printed above, then "
+            f"adjust the `split` match logic to the real folder name."
         )
+
     if subject is not None:
-        test_csvs = [f for f in test_csvs if subject in f]
+        found_csvs = [f for f in found_csvs if subject in f]
+
     frames = []
-    for f in test_csvs:
-        local_path = hf_hub_download(repo_id, f, repo_type="dataset")
-        df = pd.read_csv(local_path)
-        df["subject"] = f.split("/")[-1].replace(".csv", "")
+    for f in found_csvs:
+        df = pd.read_csv(f)
+        df["subject"] = os.path.basename(f).replace(".csv", "")
         frames.append(df)
     return pd.concat(frames, ignore_index=True)
 
 def pull_arabicmmlu():
-    # Config name is capitalized 'All'. This repo is parquet-native so
-    # load_dataset works directly — no script bypass needed here.
     return load_dataset("MBZUAI/ArabicMMLU", "All")
 
 def pull_afrimmlu(lang_code="yor"):
     # masakhane IrokoBench AfriMMLU; lang_code e.g. 'yor' (Yoruba), 'hau' (Hausa), 'swa' (Swahili)
-    # Verify this exact dataset id/config on HF before relying on it — IrokoBench
-    # subsets are sometimes split across multiple repo names. If load_dataset
-    # fails here with the same script error, apply the same raw-file bypass
-    # used in pull_cmmlu() above: list_repo_files + hf_hub_download + read_csv.
+    # If this hits the same script error, inspect the repo's file browser on HF
+    # directly (huggingface.co/datasets/masakhane/afrimmlu/tree/main) before
+    # guessing the fix — do not assume it's the same zip structure as CMMLU.
     return load_dataset("masakhane/afrimmlu", lang_code)
 
 def pull_wildchat(language_filter=None, streaming=True, n=2000):
