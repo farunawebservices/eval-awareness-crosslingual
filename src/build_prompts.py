@@ -24,16 +24,10 @@ TOKENIZER_NAME = "Qwen/Qwen2.5-7B-Instruct"
 CONDITIONS = ["deploy_plain", "deploy_framed", "eval_explicit", "eval_implicit"]
 LANGUAGES = ["en"]  # zh, ar, yo added later — same build_rows() code path
 
-# No single correct string exists for open-ended rewrite tasks (expected_style
-# "short_text"). Per CLAUDE.md rule 6 (no silent placeholder data), such tasks
-# get gold_answer=None rather than a fabricated canonical answer.
-GOLD_ANSWERS = {
-    "arith_001": "12",
-    "arith_002": "12",
-    "logic_001": "no",
-    "coding_001": "3",
-    "writing_001": None,
-}
+# gold_answer now lives directly on each task in data/controlled_tasks_seed.json
+# (None for non-scoreable open-ended "text" tasks, never a fabricated canonical
+# answer — CLAUDE.md rule 6). Read from task["gold_answer"] below; a task missing
+# the key raises KeyError rather than silently defaulting.
 
 
 def load_tasks() -> list[dict]:
@@ -83,7 +77,7 @@ def build_rows(tasks: list[dict], wrappers: dict, tokenizer) -> list[dict]:
                         "user_text": user_text,
                         "rendered": rendered,
                         "n_tokens": n_tokens,
-                        "gold_answer": GOLD_ANSWERS[task["pair_id"]],
+                        "gold_answer": task["gold_answer"],
                     }
                 )
     return sort_rows(rows)

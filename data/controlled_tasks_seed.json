@@ -1,0 +1,212 @@
+[
+  {
+    "pair_id": "arith_001",
+    "domain": "arith",
+    "task_en": "Solve 24 = 2p. Return only the value of p.",
+    "gold_answer": "12",
+    "scoreable": true
+  },
+  {
+    "pair_id": "arith_002",
+    "domain": "arith",
+    "task_en": "What is 15% of 80? Return only the number.",
+    "gold_answer": "12",
+    "scoreable": true
+  },
+  {
+    "pair_id": "arith_003",
+    "domain": "arith",
+    "task_en": "What is 9 multiplied by 7? Return only the number.",
+    "gold_answer": "63",
+    "scoreable": true
+  },
+  {
+    "pair_id": "arith_004",
+    "domain": "arith",
+    "task_en": "A rectangle has a length of 8 and a width of 5. Return only its area.",
+    "gold_answer": "40",
+    "scoreable": true
+  },
+  {
+    "pair_id": "arith_005",
+    "domain": "arith",
+    "task_en": "What is 144 divided by 12? Return only the number.",
+    "gold_answer": "12",
+    "scoreable": true
+  },
+  {
+    "pair_id": "arith_006",
+    "domain": "arith",
+    "task_en": "Solve 3x + 5 = 20 for x. Return only the value of x.",
+    "gold_answer": "5",
+    "scoreable": true
+  },
+  {
+    "pair_id": "code_001",
+    "domain": "code",
+    "task_en": "In Python, what does len([3, 5, 7]) return? Return only the value.",
+    "gold_answer": "3",
+    "scoreable": true
+  },
+  {
+    "pair_id": "code_002",
+    "domain": "code",
+    "task_en": "In Python, what is the result of 3 + 4 * 2? Return only the value.",
+    "gold_answer": "11",
+    "scoreable": true
+  },
+  {
+    "pair_id": "code_003",
+    "domain": "code",
+    "task_en": "In Python, what does \"hello\"[1] return? Return only the value.",
+    "gold_answer": "e",
+    "scoreable": true
+  },
+  {
+    "pair_id": "code_004",
+    "domain": "code",
+    "task_en": "In Python, what does len(\"python\") return? Return only the value.",
+    "gold_answer": "6",
+    "scoreable": true
+  },
+  {
+    "pair_id": "code_005",
+    "domain": "code",
+    "task_en": "In Python, what does 10 % 3 return? Return only the value.",
+    "gold_answer": "1",
+    "scoreable": true
+  },
+  {
+    "pair_id": "code_006",
+    "domain": "code",
+    "task_en": "In Python, what does max([4, 9, 2]) return? Return only the value.",
+    "gold_answer": "9",
+    "scoreable": true
+  },
+  {
+    "pair_id": "logic_001",
+    "domain": "logic",
+    "task_en": "If all cats are mammals and all mammals are animals, are all cats animals? Answer yes or no. Return only yes or no.",
+    "gold_answer": "yes",
+    "scoreable": true
+  },
+  {
+    "pair_id": "logic_002",
+    "domain": "logic",
+    "task_en": "If it is raining, the ground gets wet. The ground is dry. Is it currently raining? Answer yes or no. Return only yes or no.",
+    "gold_answer": "no",
+    "scoreable": true
+  },
+  {
+    "pair_id": "logic_003",
+    "domain": "logic",
+    "task_en": "If every square is a rectangle, is every rectangle a square? Answer yes or no. Return only yes or no.",
+    "gold_answer": "no",
+    "scoreable": true
+  },
+  {
+    "pair_id": "logic_004",
+    "domain": "logic",
+    "task_en": "If A is taller than B, and B is taller than C, is A taller than C? Answer yes or no. Return only yes or no.",
+    "gold_answer": "yes",
+    "scoreable": true
+  },
+  {
+    "pair_id": "logic_005",
+    "domain": "logic",
+    "task_en": "If all birds can fly and a penguin is a bird, does this prove that penguins can fly? Answer yes or no. Return only yes or no.",
+    "gold_answer": "yes",
+    "scoreable": true
+  },
+  {
+    "pair_id": "logic_006",
+    "domain": "logic",
+    "task_en": "If some fruits are sweet and all apples are fruits, can we conclude that some apples are sweet? Answer yes or no. Return only yes or no.",
+    "gold_answer": "no",
+    "scoreable": true
+  },
+  {
+    "pair_id": "fact_001",
+    "domain": "fact",
+    "task_en": "How many degrees are in a right angle? Return only the number.",
+    "gold_answer": "90",
+    "scoreable": true
+  },
+  {
+    "pair_id": "fact_002",
+    "domain": "fact",
+    "task_en": "What is the chemical symbol for oxygen? Return only the symbol.",
+    "gold_answer": "O",
+    "scoreable": true
+  },
+  {
+    "pair_id": "fact_003",
+    "domain": "fact",
+    "task_en": "How many minutes are in one hour? Return only the number.",
+    "gold_answer": "60",
+    "scoreable": true
+  },
+  {
+    "pair_id": "fact_004",
+    "domain": "fact",
+    "task_en": "What is the freezing point of water in Celsius? Return only the number.",
+    "gold_answer": "0",
+    "scoreable": true
+  },
+  {
+    "pair_id": "fact_005",
+    "domain": "fact",
+    "task_en": "How many sides does a hexagon have? Return only the number.",
+    "gold_answer": "6",
+    "scoreable": true
+  },
+  {
+    "pair_id": "fact_006",
+    "domain": "fact",
+    "task_en": "What is the chemical symbol for gold? Return only the symbol.",
+    "gold_answer": "Au",
+    "scoreable": true
+  },
+  {
+    "pair_id": "text_001",
+    "domain": "text",
+    "task_en": "Rewrite this sentence to be more polite: Send me the report now.",
+    "gold_answer": null,
+    "scoreable": false
+  },
+  {
+    "pair_id": "text_002",
+    "domain": "text",
+    "task_en": "Rewrite this sentence to sound more formal: I can't come to the meeting today.",
+    "gold_answer": null,
+    "scoreable": false
+  },
+  {
+    "pair_id": "text_003",
+    "domain": "text",
+    "task_en": "Turn this statement into a question: The train arrives at nine.",
+    "gold_answer": null,
+    "scoreable": false
+  },
+  {
+    "pair_id": "text_004",
+    "domain": "text",
+    "task_en": "Rewrite this instruction to sound like a gentle request: Close the window immediately.",
+    "gold_answer": null,
+    "scoreable": false
+  },
+  {
+    "pair_id": "text_005",
+    "domain": "text",
+    "task_en": "Rewrite this sentence to sound more encouraging: You did not finish the assignment.",
+    "gold_answer": null,
+    "scoreable": false
+  },
+  {
+    "pair_id": "text_006",
+    "domain": "text",
+    "task_en": "Combine these two sentences into one sentence: She opened the door. She walked inside.",
+    "gold_answer": null,
+    "scoreable": false
+  }
+]
