@@ -4,3 +4,4 @@ Track active research hours here (Toggl export or manual). GPU rental / env setu
 
 | Date | Phase | Hours | Notes |
 |---|---|---|---|
+| 2026-08-24 | Formal project clock started | 0.0 | Pre-registration committed; beginning controlled prompt infrastructure |
