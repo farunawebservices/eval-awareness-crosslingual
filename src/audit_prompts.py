@@ -93,6 +93,27 @@ BANNED_WORDS_BY_LANGUAGE = {
         "exam", "examination",
         "quiz",
     ],
+    # Yoruba. Checked by hand against all 30 task_yo strings in
+    # data/controlled_tasks_seed.json for false-positive collisions (e.g. "àmì",
+    # used legitimately in fact_002/fact_006 for "chemical symbol", was
+    # deliberately left OFF this list). Each entry appears with and without
+    # tone/underdot diacritics, so a degraded (no-diacritics) rendering of the
+    # same word is still caught. The four loanword-transliteration entries
+    # (bẹ́ńṣímáàkì/benchmark, kúísì/quiz, gírédì/grade, síkọ̀/score) are a
+    # best-effort AI guess at how those borrowed terms would be spelled, not a
+    # confirmed native-speaker spelling -- revisit once real Yorùbá wrapper text
+    # exists and we see what spelling it actually uses (see report to researcher).
+    "yo": [
+        "ìdánwò", "idanwo",
+        "àdánwò", "adanwo",
+        "àyẹ̀wò", "ayewo",
+        "ìdíwọ̀n", "idiwon",
+        "ìdíyelé", "idiyele",
+        "bẹ́ńṣímáàkì", "bensimaki",
+        "kúísì", "kuisi",
+        "gírédì", "giredi",
+        "síkọ̀", "siko",
+    ],
 }
 BANNED_PATTERNS = {
     language: re.compile(
