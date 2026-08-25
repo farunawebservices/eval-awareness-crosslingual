@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "experiments/h1_en_v2/schema/item.schema.json",
+  "title": "H1 EN v2 semantic item record (Stage A permissive)",
+  "description": "One record is one independent semantic nucleus. Records store frame-neutral core content only; eval/deploy prompt text is never stored here. The four rendered variants (eval_prose, deploy_prose, eval_mcq, deploy_mcq) are conceptual and documented only in config/README. The split unit is the semantic item and never a family, domain, prompt, format, frame, or paraphrase. Stage A: all content fields and split are null. Stage C gate: every record must have populated content (nucleus, and mcq_stem/options/answer_index where applicable), recorded human review (audit.human_reviewed=true with reviewer and reviewed_at), recorded provenance (source, author, method), and a verified distinct-nucleus check confirming the item is not a paraphrase of any other item.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["item_id", "language", "domain_id", "family_id", "split", "core", "provenance", "audit"],
+  "properties": {
+    "item_id": {
+      "type": "string",
+      "pattern": "^h1en_v2_item_(0[0-6][0-9]|070)$",
+      "description": "h1en_v2_item_001 .. h1en_v2_item_070, unique."
+    },
+    "language": { "const": "en" },
+    "domain_id": {
+      "type": "string",
+      "enum": ["D1", "D2", "D3", "D4", "D5", "D6", "D7"],
+      "description": "Fixed structural domain slot. No topic semantics asserted in Stage A."
+    },
+    "family_id": {
+      "type": "string",
+      "enum": ["F1", "F2", "F3", "F4", "F5"],
+      "description": "Fixed structural template-family slot. Never a split unit."
+    },
+    "split": {
+      "type": ["string", "null"],
+      "enum": [null, "train", "val", "test"],
+      "default": null,
+      "description": "Null in Stage A. Assigned later at the semantic-item level only. Planned quotas: train=35, val=15, test=20."
+    },
+    "core": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nucleus", "mcq_stem", "options", "answer_index", "answer_free_form"],
+      "description": "Frame-neutral content only. Must contain no eval framing, no deploy framing, no system prompt, and no rendered prompt text.",
+      "properties": {
+        "nucleus": { "type": ["string", "null"], "default": null, "description": "Frame-neutral semantic nucleus. Null in Stage A; required non-null in Stage C." },
+        "mcq_stem": { "type": ["string", "null"], "default": null, "description": "Frame-neutral MCQ stem. Null in Stage A." },
+        "options": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": { "type": ["string", "null"] },
+          "default": [null, null, null, null],
+          "description": "Exactly four options. All null in Stage A."
+        },
+        "answer_index": { "type": ["integer", "null"], "minimum": 0, "maximum": 3, "default": null, "description": "Index into options. Null in Stage A." },
+        "answer_free_form": { "type": ["string", "null"], "default": null, "description": "Prose reference answer. Null in Stage A." }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stage", "source", "author", "created_at", "method", "notes"],
+      "description": "Stage A: all fields null except stage. Stage C gate: source, author, created_at, and method must be populated and verifiable.",
+      "properties": {
+        "stage": { "type": "string", "enum": ["A", "B", "C"] },
+        "source": { "type": ["string", "null"], "default": null },
+        "author": { "type": ["string", "null"], "default": null },
+        "created_at": { "type": ["string", "null"], "default": null },
+        "method": { "type": ["string", "null"], "default": null },
+        "notes": { "type": ["string", "null"], "default": null }
+      }
+    },
+    "audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["content_populated", "human_reviewed", "reviewer", "reviewed_at", "distinct_nucleus_verified", "notes"],
+      "description": "Stage C gate: content_populated, human_reviewed, and distinct_nucleus_verified must all be true, with reviewer and reviewed_at populated.",
+      "properties": {
+        "content_populated": { "type": "boolean", "default": false },
+        "human_reviewed": { "type": "boolean", "default": false },
+        "reviewer": { "type": ["string", "null"], "default": null },
+        "reviewed_at": { "type": ["string", "null"], "default": null },
+        "distinct_nucleus_verified": { "type": "boolean", "default": false, "description": "True only after confirming this item is not a paraphrase of any other item." },
+        "notes": { "type": ["string", "null"], "default": null }
+      }
+    }
+  }
+}

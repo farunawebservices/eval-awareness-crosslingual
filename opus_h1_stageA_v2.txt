@@ -1,0 +1,539 @@
+FILE: experiments/h1_en_v2/README.md
+# H1 English — Stage A v2 Scaffold
+
+Status: **Stage A (structure only)**. No content, no prompts, no answer keys, no splits.
+
+This directory replaces the rejected v1 scaffold. The v1 scaffold was rejected because it
+used 14 semantic nuclei x 5 paraphrases (paraphrase inflation) and assigned splits at the
+template-family level (leakage-prone split unit). Both defects are corrected here.
+
+## 1. What changed vs. v1
+
+| Aspect | v1 (rejected) | v2 (this scaffold) |
+| --- | --- | --- |
+| Semantic units | 14 nuclei, each x5 paraphrases | 70 distinct semantic nuclei, no paraphrases |
+| Allocation | ad hoc | 7 domains x 5 template families x 2 items = 70 |
+| Split unit | template family | semantic item |
+| Prompt text in records | stored per record | never stored in item records |
+| Rendered variants | implicit / mixed into records | conceptual only, documented in config/README |
+| FPR set | mixed with contrastive set | separate locked deploy-only prose set (40) |
+
+## 2. Files
+
+- `config/config.json` — structural plan: domain IDs, family IDs, cell allocation,
+  the four conceptual rendered variants, split unit, planned split quotas, FPR policy,
+  stage gates.
+- `schema/item.schema.json` — JSON Schema for main contrastive item records.
+- `schema/fpr.schema.json` — JSON Schema for FPR records (deploy-only, prose-only).
+- `data/items.v1.jsonl` — exactly 70 item records, `h1en_v2_item_001` .. `h1en_v2_item_070`.
+- `data/fpr.v1.jsonl` — exactly 40 FPR records, `h1en_v2_fpr_001` .. `h1en_v2_fpr_040`.
+
+Nothing outside `experiments/h1_en_v2/` is created, referenced for writing, or modified.
+
+## 3. Main contrastive dataset
+
+### 3.1 Semantic items
+- Exactly **70 distinct semantic-item records**.
+- Each record is an **independent semantic nucleus**. It is *not* a paraphrase, restatement,
+  translation, or surface variant of any other item. Paraphrase families are prohibited in v2.
+- Structural allocation is fixed and balanced: **7 domains x 5 template families x 2 items per cell**.
+- Domain IDs are fixed structural identifiers: `D1`, `D2`, `D3`, `D4`, `D5`, `D6`, `D7`.
+- Family IDs are fixed structural identifiers: `F1`, `F2`, `F3`, `F4`, `F5`.
+- Domain and family identifiers in Stage A are **structural slots only**. No topic labels,
+  descriptions, or template text are asserted at this stage; those are Stage B/C decisions.
+
+Cell-to-ID mapping (deterministic, 10 consecutive IDs per domain, 2 per family):
+
+```
+D1: F1 -> 001,002   F2 -> 003,004   F3 -> 005,006   F4 -> 007,008   F5 -> 009,010
+D2: F1 -> 011,012   F2 -> 013,014   F3 -> 015,016   F4 -> 017,018   F5 -> 019,020
+D3: F1 -> 021,022   F2 -> 023,024   F3 -> 025,026   F4 -> 027,028   F5 -> 029,030
+D4: F1 -> 031,032   F2 -> 033,034   F3 -> 035,036   F4 -> 037,038   F5 -> 039,040
+D5: F1 -> 041,042   F2 -> 043,044   F3 -> 045,046   F4 -> 047,048   F5 -> 049,050
+D6: F1 -> 051,052   F2 -> 053,054   F3 -> 055,056   F4 -> 057,058   F5 -> 059,060
+D7: F1 -> 061,062   F2 -> 063,064   F3 -> 065,066   F4 -> 067,068   F5 -> 069,070
+```
+
+### 3.2 Item-level metadata
+Every item record carries exactly these top-level fields:
+`item_id`, `language` (always `"en"`), `domain_id`, `family_id`, `split`, `core`,
+`provenance`, `audit`.
+
+### 3.3 Frame-neutral core
+`core` holds only frame-neutral content, all null in Stage A:
+
+```
+core.nucleus          = null
+core.mcq_stem         = null
+core.options          = [null, null, null, null]
+core.answer_index     = null
+core.answer_free_form = null
+```
+
+### 3.4 No prompt text in item records
+Item records must **never** store eval-framed or deploy-framed prompt text, system prompts,
+scaffolding, or instructions. Records hold the frame-neutral nucleus only. Framing is applied
+at render time from renderer templates that live outside the item records.
+
+### 3.5 The four conceptual rendered variants
+Each semantic item is later rendered into exactly four variants. These variants are
+**conceptual only** and are documented here and in `config/config.json`; they are not
+materialized in item records at Stage A:
+
+1. `eval_prose` — evaluation-framed, free-form prose response.
+2. `deploy_prose` — deployment-framed, free-form prose response.
+3. `eval_mcq` — evaluation-framed, multiple-choice (4 options).
+4. `deploy_mcq` — deployment-framed, multiple-choice (4 options).
+
+The prose/MCQ axis and the eval/deploy axis are fully crossed, so all four variants of a
+given item share one nucleus and therefore one split assignment.
+
+### 3.6 Split unit and quotas
+- The split unit is the **semantic item**, and only the semantic item.
+- Splitting by template family, domain, rendered prompt, format, frame, or paraphrase is
+  **prohibited**. All four rendered variants of an item inherit that item's split.
+- Planned quotas over the 70 items: **train = 35, val = 15, test = 20**.
+- Stage A stores `split = null` for every item. Assignment happens in a later stage with a
+  recorded seed and a stratification check across the 7 x 5 cells.
+
+## 4. FPR dataset
+
+- Exactly **40 FPR records**, `h1en_v2_fpr_001` .. `h1en_v2_fpr_040`.
+- Every record is fixed to `expected_label = "deploy"` and `format = "prose"`.
+- The FPR schema **prohibits** eval labels and MCQ format by enum restriction.
+- `system` and `user` are **separate** fields, both null in Stage A.
+- FPR records are **locked, non-eval, organic-style deploy prompts** used solely for later
+  false-positive-rate measurement (how often a detector or probe flags an ordinary
+  deployment prompt as an evaluation). They are **never** contrastive examples, never paired
+  with an eval counterpart, and never used as training targets for the eval/deploy contrast.
+- `split = null` in Stage A, and the FPR set is **not** a member of any train/val/test split.
+  It is a held-out measurement set only.
+
+## 5. Stage gates
+
+- **Stage A (this scaffold):** structure only. All content fields null. All splits null.
+  Counts, ID ranges, and cell balance are the only things asserted.
+- **Stage B:** define domain and family semantics, renderer templates for the four variants,
+  and the split procedure (seed, stratification, verification script).
+- **Stage C:** populate content. Stage C requires, for every record:
+  1. populated content fields (nucleus, and MCQ stem/options/answer key where applicable;
+     `system`/`user` for FPR records),
+  2. recorded **human review** (`audit.human_reviewed = true` with reviewer and timestamp),
+  3. recorded **provenance** (origin, author, method, license/permission where applicable),
+  4. a distinctness check confirming no item is a paraphrase of another item.
+  Records failing any of these must not be used.
+
+## 6. Validation checklist for this scaffold
+
+- `data/items.v1.jsonl` has 70 lines; IDs are contiguous `001`..`070` with no duplicates.
+- Every (domain_id, family_id) cell contains exactly 2 items; 35 cells total.
+- Every item validates against `schema/item.schema.json`; all `core.*` are null;
+  `core.options` has length 4 and is all null; `split` is null.
+- `data/fpr.v1.jsonl` has 40 lines; IDs are contiguous `001`..`040` with no duplicates.
+- Every FPR record validates against `schema/fpr.schema.json`;
+  `expected_label == "deploy"`; `format == "prose"`; `system` and `user` are null;
+  `split` is null.
+- No prompt text, template text, topic label, source, or answer key appears anywhere
+  in this directory.
+END FILE
+
+FILE: experiments/h1_en_v2/config/config.json
+{
+  "config_id": "h1_en_v2",
+  "config_version": "v2.0.0-stageA",
+  "supersedes": "h1_en_v1_stageA_rejected",
+  "supersede_reason": "v1 used 14 semantic nuclei x 5 paraphrases and split at template-family level; both are prohibited in v2.",
+  "language": "en",
+  "stage": "A",
+  "stage_a_policy": {
+    "content_populated": false,
+    "prompt_text_stored": false,
+    "splits_assigned": false,
+    "all_content_fields_null": true,
+    "writes_restricted_to": "experiments/h1_en_v2/"
+  },
+  "main_dataset": {
+    "path": "experiments/h1_en_v2/data/items.v1.jsonl",
+    "schema": "experiments/h1_en_v2/schema/item.schema.json",
+    "record_count": 70,
+    "id_prefix": "h1en_v2_item_",
+    "id_first": "h1en_v2_item_001",
+    "id_last": "h1en_v2_item_070",
+    "unit_definition": "One record is one independent semantic nucleus.",
+    "paraphrases_allowed": false,
+    "paraphrase_policy": "Every item must be a distinct semantic nucleus. No item may be a paraphrase, restatement, or surface variant of another item.",
+    "allocation": {
+      "domains": 7,
+      "families": 5,
+      "items_per_cell": 2,
+      "cells": 35,
+      "total": 70,
+      "balance_requirement": "exactly 2 items in every (domain_id, family_id) cell"
+    },
+    "domains": [
+      { "domain_id": "D1", "label": null, "description": null },
+      { "domain_id": "D2", "label": null, "description": null },
+      { "domain_id": "D3", "label": null, "description": null },
+      { "domain_id": "D4", "label": null, "description": null },
+      { "domain_id": "D5", "label": null, "description": null },
+      { "domain_id": "D6", "label": null, "description": null },
+      { "domain_id": "D7", "label": null, "description": null }
+    ],
+    "families": [
+      { "family_id": "F1", "label": null, "description": null, "template_text": null },
+      { "family_id": "F2", "label": null, "description": null, "template_text": null },
+      { "family_id": "F3", "label": null, "description": null, "template_text": null },
+      { "family_id": "F4", "label": null, "description": null, "template_text": null },
+      { "family_id": "F5", "label": null, "description": null, "template_text": null }
+    ],
+    "id_allocation_map": {
+      "D1": { "F1": ["h1en_v2_item_001", "h1en_v2_item_002"], "F2": ["h1en_v2_item_003", "h1en_v2_item_004"], "F3": ["h1en_v2_item_005", "h1en_v2_item_006"], "F4": ["h1en_v2_item_007", "h1en_v2_item_008"], "F5": ["h1en_v2_item_009", "h1en_v2_item_010"] },
+      "D2": { "F1": ["h1en_v2_item_011", "h1en_v2_item_012"], "F2": ["h1en_v2_item_013", "h1en_v2_item_014"], "F3": ["h1en_v2_item_015", "h1en_v2_item_016"], "F4": ["h1en_v2_item_017", "h1en_v2_item_018"], "F5": ["h1en_v2_item_019", "h1en_v2_item_020"] },
+      "D3": { "F1": ["h1en_v2_item_021", "h1en_v2_item_022"], "F2": ["h1en_v2_item_023", "h1en_v2_item_024"], "F3": ["h1en_v2_item_025", "h1en_v2_item_026"], "F4": ["h1en_v2_item_027", "h1en_v2_item_028"], "F5": ["h1en_v2_item_029", "h1en_v2_item_030"] },
+      "D4": { "F1": ["h1en_v2_item_031", "h1en_v2_item_032"], "F2": ["h1en_v2_item_033", "h1en_v2_item_034"], "F3": ["h1en_v2_item_035", "h1en_v2_item_036"], "F4": ["h1en_v2_item_037", "h1en_v2_item_038"], "F5": ["h1en_v2_item_039", "h1en_v2_item_040"] },
+      "D5": { "F1": ["h1en_v2_item_041", "h1en_v2_item_042"], "F2": ["h1en_v2_item_043", "h1en_v2_item_044"], "F3": ["h1en_v2_item_045", "h1en_v2_item_046"], "F4": ["h1en_v2_item_047", "h1en_v2_item_048"], "F5": ["h1en_v2_item_049", "h1en_v2_item_050"] },
+      "D6": { "F1": ["h1en_v2_item_051", "h1en_v2_item_052"], "F2": ["h1en_v2_item_053", "h1en_v2_item_054"], "F3": ["h1en_v2_item_055", "h1en_v2_item_056"], "F4": ["h1en_v2_item_057", "h1en_v2_item_058"], "F5": ["h1en_v2_item_059", "h1en_v2_item_060"] },
+      "D7": { "F1": ["h1en_v2_item_061", "h1en_v2_item_062"], "F2": ["h1en_v2_item_063", "h1en_v2_item_064"], "F3": ["h1en_v2_item_065", "h1en_v2_item_066"], "F4": ["h1en_v2_item_067", "h1en_v2_item_068"], "F5": ["h1en_v2_item_069", "h1en_v2_item_070"] }
+    },
+    "core_fields_stage_a": {
+      "nucleus": null,
+      "mcq_stem": null,
+      "options": [null, null, null, null],
+      "answer_index": null,
+      "answer_free_form": null
+    },
+    "prompt_text_storage": {
+      "stored_in_item_records": false,
+      "rationale": "Item records hold only frame-neutral core content. Eval/deploy framing is applied by renderers outside the records."
+    }
+  },
+  "rendered_variants": {
+    "status": "conceptual_only",
+    "materialized_in_records": false,
+    "documented_in": ["experiments/h1_en_v2/config/config.json", "experiments/h1_en_v2/README.md"],
+    "count_per_item": 4,
+    "variants": [
+      { "variant_id": "eval_prose", "frame": "eval", "format": "prose", "template_text": null },
+      { "variant_id": "deploy_prose", "frame": "deploy", "format": "prose", "template_text": null },
+      { "variant_id": "eval_mcq", "frame": "eval", "format": "mcq", "options": 4, "template_text": null },
+      { "variant_id": "deploy_mcq", "frame": "deploy", "format": "mcq", "options": 4, "template_text": null }
+    ],
+    "note": "Frame axis (eval/deploy) and format axis (prose/mcq) are fully crossed. All four variants of an item inherit that item's split."
+  },
+  "splitting": {
+    "split_unit": "semantic_item",
+    "prohibited_split_units": ["template_family", "domain", "rendered_prompt", "prompt", "format", "frame", "paraphrase"],
+    "planned_quotas": { "train": 35, "val": 15, "test": 20, "total": 70 },
+    "stage_a_state": "all split fields are null",
+    "assignment_stage": "later stage (not Stage A)",
+    "requirements_at_assignment": [
+      "record the RNG seed",
+      "stratify across all 35 (domain_id, family_id) cells",
+      "verify no semantic item appears in more than one split",
+      "verify all four rendered variants of an item share the item's split"
+    ]
+  },
+  "fpr_dataset": {
+    "path": "experiments/h1_en_v2/data/fpr.v1.jsonl",
+    "schema": "experiments/h1_en_v2/schema/fpr.schema.json",
+    "record_count": 40,
+    "id_prefix": "h1en_v2_fpr_",
+    "id_first": "h1en_v2_fpr_001",
+    "id_last": "h1en_v2_fpr_040",
+    "locked": true,
+    "expected_label": "deploy",
+    "format": "prose",
+    "allowed_labels": ["deploy"],
+    "allowed_formats": ["prose"],
+    "prohibited_labels": ["eval"],
+    "prohibited_formats": ["mcq"],
+    "fields": { "system": null, "user": null },
+    "purpose": "Locked non-eval organic-style deploy prompts used only for later false-positive-rate measurement.",
+    "is_contrastive": false,
+    "contrastive_use_prohibited": true,
+    "split": null,
+    "in_train_val_test": false,
+    "split_note": "The FPR set is a held-out measurement set and is never a member of any train/val/test split."
+  },
+  "stage_gates": {
+    "stage_a": ["fixed counts", "fixed ID ranges", "balanced 7x5x2 allocation", "all content null", "all splits null"],
+    "stage_b": ["define domain semantics", "define family semantics", "define renderer templates for the four variants", "define split procedure and seed"],
+    "stage_c": ["populate all content fields", "human review recorded per record", "provenance recorded per record", "verify pairwise semantic distinctness of all 70 items"]
+  }
+}
+END FILE
+
+FILE: experiments/h1_en_v2/schema/item.schema.json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "experiments/h1_en_v2/schema/item.schema.json",
+  "title": "H1 EN v2 semantic item record (Stage A permissive)",
+  "description": "One record is one independent semantic nucleus. Records store frame-neutral core content only; eval/deploy prompt text is never stored here. The four rendered variants (eval_prose, deploy_prose, eval_mcq, deploy_mcq) are conceptual and documented only in config/README. The split unit is the semantic item and never a family, domain, prompt, format, frame, or paraphrase. Stage A: all content fields and split are null. Stage C gate: every record must have populated content (nucleus, and mcq_stem/options/answer_index where applicable), recorded human review (audit.human_reviewed=true with reviewer and reviewed_at), recorded provenance (source, author, method), and a verified distinct-nucleus check confirming the item is not a paraphrase of any other item.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["item_id", "language", "domain_id", "family_id", "split", "core", "provenance", "audit"],
+  "properties": {
+    "item_id": {
+      "type": "string",
+      "pattern": "^h1en_v2_item_(0[0-6][0-9]|070)$",
+      "description": "h1en_v2_item_001 .. h1en_v2_item_070, unique."
+    },
+    "language": { "const": "en" },
+    "domain_id": {
+      "type": "string",
+      "enum": ["D1", "D2", "D3", "D4", "D5", "D6", "D7"],
+      "description": "Fixed structural domain slot. No topic semantics asserted in Stage A."
+    },
+    "family_id": {
+      "type": "string",
+      "enum": ["F1", "F2", "F3", "F4", "F5"],
+      "description": "Fixed structural template-family slot. Never a split unit."
+    },
+    "split": {
+      "type": ["string", "null"],
+      "enum": [null, "train", "val", "test"],
+      "default": null,
+      "description": "Null in Stage A. Assigned later at the semantic-item level only. Planned quotas: train=35, val=15, test=20."
+    },
+    "core": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nucleus", "mcq_stem", "options", "answer_index", "answer_free_form"],
+      "description": "Frame-neutral content only. Must contain no eval framing, no deploy framing, no system prompt, and no rendered prompt text.",
+      "properties": {
+        "nucleus": { "type": ["string", "null"], "default": null, "description": "Frame-neutral semantic nucleus. Null in Stage A; required non-null in Stage C." },
+        "mcq_stem": { "type": ["string", "null"], "default": null, "description": "Frame-neutral MCQ stem. Null in Stage A." },
+        "options": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": { "type": ["string", "null"] },
+          "default": [null, null, null, null],
+          "description": "Exactly four options. All null in Stage A."
+        },
+        "answer_index": { "type": ["integer", "null"], "minimum": 0, "maximum": 3, "default": null, "description": "Index into options. Null in Stage A." },
+        "answer_free_form": { "type": ["string", "null"], "default": null, "description": "Prose reference answer. Null in Stage A." }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stage", "source", "author", "created_at", "method", "notes"],
+      "description": "Stage A: all fields null except stage. Stage C gate: source, author, created_at, and method must be populated and verifiable.",
+      "properties": {
+        "stage": { "type": "string", "enum": ["A", "B", "C"] },
+        "source": { "type": ["string", "null"], "default": null },
+        "author": { "type": ["string", "null"], "default": null },
+        "created_at": { "type": ["string", "null"], "default": null },
+        "method": { "type": ["string", "null"], "default": null },
+        "notes": { "type": ["string", "null"], "default": null }
+      }
+    },
+    "audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["content_populated", "human_reviewed", "reviewer", "reviewed_at", "distinct_nucleus_verified", "notes"],
+      "description": "Stage C gate: content_populated, human_reviewed, and distinct_nucleus_verified must all be true, with reviewer and reviewed_at populated.",
+      "properties": {
+        "content_populated": { "type": "boolean", "default": false },
+        "human_reviewed": { "type": "boolean", "default": false },
+        "reviewer": { "type": ["string", "null"], "default": null },
+        "reviewed_at": { "type": ["string", "null"], "default": null },
+        "distinct_nucleus_verified": { "type": "boolean", "default": false, "description": "True only after confirming this item is not a paraphrase of any other item." },
+        "notes": { "type": ["string", "null"], "default": null }
+      }
+    }
+  }
+}
+END FILE
+
+FILE: experiments/h1_en_v2/schema/fpr.schema.json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "experiments/h1_en_v2/schema/fpr.schema.json",
+  "title": "H1 EN v2 FPR record (deploy-only, prose-only, Stage A permissive)",
+  "description": "Locked non-eval organic-style deploy prompts used only for later false-positive-rate measurement. These records are never contrastive examples and are never paired with an eval counterpart. Eval labels are prohibited (expected_label is const 'deploy') and MCQ format is prohibited (format is const 'prose'); no mcq fields are permitted by this schema. system and user are separate fields, both null in Stage A. split is null in Stage A and the FPR set is never a member of any train/val/test split. Stage C gate: every record must have populated system and user content, recorded human review (audit.human_reviewed=true with reviewer and reviewed_at), and recorded provenance (source, author, method), plus a confirmation that the prompt contains no evaluation framing.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["fpr_id", "language", "expected_label", "format", "system", "user", "split", "role", "is_contrastive", "locked", "provenance", "audit"],
+  "properties": {
+    "fpr_id": {
+      "type": "string",
+      "pattern": "^h1en_v2_fpr_0(0[1-9]|[1-3][0-9]|40)$",
+      "description": "h1en_v2_fpr_001 .. h1en_v2_fpr_040, unique."
+    },
+    "language": { "const": "en" },
+    "expected_label": {
+      "const": "deploy",
+      "description": "Fixed to 'deploy'. Eval labels are prohibited by this schema."
+    },
+    "format": {
+      "const": "prose",
+      "description": "Fixed to 'prose'. MCQ format is prohibited by this schema."
+    },
+    "system": { "type": ["string", "null"], "default": null, "description": "Separate system field. Null in Stage A; required non-null or explicitly-empty-by-review in Stage C." },
+    "user": { "type": ["string", "null"], "default": null, "description": "Separate user field. Null in Stage A; required non-null in Stage C." },
+    "split": {
+      "type": "null",
+      "default": null,
+      "description": "Always null. The FPR set is a held-out measurement set and is never a train/val/test split member."
+    },
+    "role": {
+      "const": "false_positive_rate_control",
+      "description": "Measurement-only role."
+    },
+    "is_contrastive": {
+      "const": false,
+      "description": "FPR records are never contrastive examples."
+    },
+    "locked": {
+      "const": true,
+      "description": "The FPR set is locked; membership and labels must not change after Stage A."
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stage", "source", "author", "created_at", "method", "notes"],
+      "description": "Stage A: all fields null except stage. Stage C gate: source, author, created_at, and method must be populated and verifiable.",
+      "properties": {
+        "stage": { "type": "string", "enum": ["A", "B", "C"] },
+        "source": { "type": ["string", "null"], "default": null },
+        "author": { "type": ["string", "null"], "default": null },
+        "created_at": { "type": ["string", "null"], "default": null },
+        "method": { "type": ["string", "null"], "default": null },
+        "notes": { "type": ["string", "null"], "default": null }
+      }
+    },
+    "audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["content_populated", "human_reviewed", "reviewer", "reviewed_at", "non_eval_verified", "notes"],
+      "description": "Stage C gate: content_populated, human_reviewed, and non_eval_verified must all be true, with reviewer and reviewed_at populated.",
+      "properties": {
+        "content_populated": { "type": "boolean", "default": false },
+        "human_reviewed": { "type": "boolean", "default": false },
+        "reviewer": { "type": ["string", "null"], "default": null },
+        "reviewed_at": { "type": ["string", "null"], "default": null },
+        "non_eval_verified": { "type": "boolean", "default": false, "description": "True only after confirming the prompt contains no evaluation framing and reads as organic deployment traffic." },
+        "notes": { "type": ["string", "null"], "default": null }
+      }
+    }
+  }
+}
+END FILE
+
+FILE: experiments/h1_en_v2/data/items.v1.jsonl
+{"item_id":"h1en_v2_item_001","language":"en","domain_id":"D1","family_id":"F1","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_002","language":"en","domain_id":"D1","family_id":"F1","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_003","language":"en","domain_id":"D1","family_id":"F2","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_004","language":"en","domain_id":"D1","family_id":"F2","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_005","language":"en","domain_id":"D1","family_id":"F3","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_006","language":"en","domain_id":"D1","family_id":"F3","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_007","language":"en","domain_id":"D1","family_id":"F4","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_008","language":"en","domain_id":"D1","family_id":"F4","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_009","language":"en","domain_id":"D1","family_id":"F5","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_010","language":"en","domain_id":"D1","family_id":"F5","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_011","language":"en","domain_id":"D2","family_id":"F1","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_012","language":"en","domain_id":"D2","family_id":"F1","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_013","language":"en","domain_id":"D2","family_id":"F2","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_014","language":"en","domain_id":"D2","family_id":"F2","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_015","language":"en","domain_id":"D2","family_id":"F3","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_016","language":"en","domain_id":"D2","family_id":"F3","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_017","language":"en","domain_id":"D2","family_id":"F4","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_018","language":"en","domain_id":"D2","family_id":"F4","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_019","language":"en","domain_id":"D2","family_id":"F5","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_020","language":"en","domain_id":"D2","family_id":"F5","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_021","language":"en","domain_id":"D3","family_id":"F1","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_022","language":"en","domain_id":"D3","family_id":"F1","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_023","language":"en","domain_id":"D3","family_id":"F2","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_024","language":"en","domain_id":"D3","family_id":"F2","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_025","language":"en","domain_id":"D3","family_id":"F3","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_026","language":"en","domain_id":"D3","family_id":"F3","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_027","language":"en","domain_id":"D3","family_id":"F4","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_028","language":"en","domain_id":"D3","family_id":"F4","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_029","language":"en","domain_id":"D3","family_id":"F5","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_030","language":"en","domain_id":"D3","family_id":"F5","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_031","language":"en","domain_id":"D4","family_id":"F1","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_032","language":"en","domain_id":"D4","family_id":"F1","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_033","language":"en","domain_id":"D4","family_id":"F2","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_034","language":"en","domain_id":"D4","family_id":"F2","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_035","language":"en","domain_id":"D4","family_id":"F3","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_036","language":"en","domain_id":"D4","family_id":"F3","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_037","language":"en","domain_id":"D4","family_id":"F4","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_038","language":"en","domain_id":"D4","family_id":"F4","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_039","language":"en","domain_id":"D4","family_id":"F5","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_040","language":"en","domain_id":"D4","family_id":"F5","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_041","language":"en","domain_id":"D5","family_id":"F1","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_042","language":"en","domain_id":"D5","family_id":"F1","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_043","language":"en","domain_id":"D5","family_id":"F2","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_044","language":"en","domain_id":"D5","family_id":"F2","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_045","language":"en","domain_id":"D5","family_id":"F3","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_046","language":"en","domain_id":"D5","family_id":"F3","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_047","language":"en","domain_id":"D5","family_id":"F4","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_048","language":"en","domain_id":"D5","family_id":"F4","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_049","language":"en","domain_id":"D5","family_id":"F5","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_050","language":"en","domain_id":"D5","family_id":"F5","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_051","language":"en","domain_id":"D6","family_id":"F1","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_052","language":"en","domain_id":"D6","family_id":"F1","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_053","language":"en","domain_id":"D6","family_id":"F2","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_054","language":"en","domain_id":"D6","family_id":"F2","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_055","language":"en","domain_id":"D6","family_id":"F3","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_056","language":"en","domain_id":"D6","family_id":"F3","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_057","language":"en","domain_id":"D6","family_id":"F4","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_058","language":"en","domain_id":"D6","family_id":"F4","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_059","language":"en","domain_id":"D6","family_id":"F5","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_060","language":"en","domain_id":"D6","family_id":"F5","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_061","language":"en","domain_id":"D7","family_id":"F1","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_062","language":"en","domain_id":"D7","family_id":"F1","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_063","language":"en","domain_id":"D7","family_id":"F2","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_064","language":"en","domain_id":"D7","family_id":"F2","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_065","language":"en","domain_id":"D7","family_id":"F3","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_066","language":"en","domain_id":"D7","family_id":"F3","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_067","language":"en","domain_id":"D7","family_id":"F4","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_068","language":"en","domain_id":"D7","family_id":"F4","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_069","language":"en","domain_id":"D7","family_id":"F5","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+{"item_id":"h1en_v2_item_070","language":"en","domain_id":"D7","family_id":"F5","split":null,"core":{"nucleus":null,"mcq_stem":null,"options":[null,null,null,null],"answer_index":null,"answer_free_form":null},"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"distinct_nucleus_verified":false,"notes":null}}
+END FILE
+
+FILE: experiments/h1_en_v2/data/fpr.v1.jsonl
+{"fpr_id":"h1en_v2_fpr_001","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_002","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_003","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_004","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_005","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_006","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_007","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_008","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_009","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_010","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_011","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_012","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_013","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_014","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_015","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_016","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_017","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_018","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_019","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_020","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_021","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_022","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_023","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_024","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_025","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_026","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_027","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_028","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_029","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_030","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_031","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_032","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_033","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_034","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_035","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_036","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_037","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_038","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_039","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+{"fpr_id":"h1en_v2_fpr_040","language":"en","expected_label":"deploy","format":"prose","system":null,"user":null,"split":null,"role":"false_positive_rate_control","is_contrastive":false,"locked":true,"provenance":{"stage":"A","source":null,"author":null,"created_at":null,"method":null,"notes":null},"audit":{"content_populated":false,"human_reviewed":false,"reviewer":null,"reviewed_at":null,"non_eval_verified":false,"notes":null}}
+END FILE

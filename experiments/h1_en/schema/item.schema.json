@@ -1,0 +1,207 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "experiments/h1_en/schema/item.schema.json",
+  "title": "h1_en semantic item record",
+  "description": "Stage A permissive schema for one frame-neutral semantic item. It admits the Stage A null skeleton. It is NOT sufficient for analysis: Stage C validation MUST additionally apply $defs.stage_c_item_requirements, which forbids the Stage A nulls. Item records never store eval or deploy prompt text; the four rendered variants (eval|deploy x prose|mcq) are defined once in config/config.json and produced at render time.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "item_id",
+    "language",
+    "domain_id",
+    "family_id",
+    "paraphrase_index",
+    "split",
+    "core",
+    "provenance",
+    "audit"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Populated in Stage A.",
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "item_id": {
+      "description": "Populated in Stage A. Pattern h1_en-item-f<NN>-p<NN>.",
+      "type": "string",
+      "pattern": "^h1_en-item-f(0[1-9]|1[0-4])-p0[1-5]$"
+    },
+    "language": {
+      "type": "string",
+      "const": "en"
+    },
+    "domain_id": {
+      "description": "Structural placeholder identifier. Carries no topic label in Stage A.",
+      "type": "string",
+      "pattern": "^dom0[1-7]$"
+    },
+    "family_id": {
+      "description": "Paraphrase cluster identifier; split assignment unit.",
+      "type": "string",
+      "pattern": "^f(0[1-9]|1[0-4])$"
+    },
+    "paraphrase_index": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "split": {
+      "description": "Null in Stage A. Assigned in Stage B at family granularity under quotas train=35, val=15, test=20.",
+      "type": ["string", "null"],
+      "enum": [null, "train", "val", "test"]
+    },
+    "core": {
+      "description": "Frame-neutral semantic content. All fields null in Stage A. Framing and prompt keys are rejected by additionalProperties: false.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nucleus",
+        "mcq_stem",
+        "options",
+        "answer_index",
+        "answer_free_form"
+      ],
+      "properties": {
+        "nucleus": {
+          "type": ["string", "null"]
+        },
+        "mcq_stem": {
+          "type": ["string", "null"]
+        },
+        "options": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {
+            "type": ["string", "null"]
+          }
+        },
+        "answer_index": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "maximum": 3
+        },
+        "answer_free_form": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "provenance": {
+      "description": "All keys null in Stage A. No sources, licenses, dates, or authors are invented.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_type",
+        "source_ref",
+        "source_license",
+        "retrieved_at",
+        "author_role",
+        "notes"
+      ],
+      "properties": {
+        "source_type": { "type": ["string", "null"] },
+        "source_ref": { "type": ["string", "null"] },
+        "source_license": { "type": ["string", "null"] },
+        "retrieved_at": { "type": ["string", "null"] },
+        "author_role": { "type": ["string", "null"] },
+        "notes": { "type": ["string", "null"] }
+      }
+    },
+    "audit": {
+      "description": "Bookkeeping only. Never holds item content.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stage",
+        "content_status",
+        "authored_by",
+        "reviewed_by",
+        "review_status",
+        "notes"
+      ],
+      "properties": {
+        "stage": {
+          "type": "string",
+          "enum": ["A", "B", "C"]
+        },
+        "content_status": {
+          "type": "string",
+          "enum": ["skeleton", "authored", "revised"]
+        },
+        "authored_by": { "type": ["string", "null"] },
+        "reviewed_by": { "type": ["string", "null"] },
+        "review_status": {
+          "type": "string",
+          "enum": ["pending", "in_review", "approved", "rejected"]
+        },
+        "notes": { "type": ["string", "null"] }
+      }
+    }
+  },
+  "$defs": {
+    "stage_c_item_requirements": {
+      "$comment": "BLOCKING at Stage C. Apply as an additional schema (allOf) alongside this file. A record that still carries the Stage A null skeleton MUST fail here.",
+      "title": "h1_en item record, Stage C content requirements",
+      "type": "object",
+      "required": ["split", "core", "provenance", "audit"],
+      "properties": {
+        "split": {
+          "type": "string",
+          "enum": ["train", "val", "test"]
+        },
+        "core": {
+          "type": "object",
+          "required": [
+            "nucleus",
+            "mcq_stem",
+            "options",
+            "answer_index",
+            "answer_free_form"
+          ],
+          "properties": {
+            "nucleus": { "type": "string", "minLength": 1 },
+            "mcq_stem": { "type": "string", "minLength": 1 },
+            "options": {
+              "type": "array",
+              "minItems": 4,
+              "maxItems": 4,
+              "uniqueItems": true,
+              "items": { "type": "string", "minLength": 1 }
+            },
+            "answer_index": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "answer_free_form": { "type": "string", "minLength": 1 }
+          }
+        },
+        "provenance": {
+          "type": "object",
+          "required": ["source_type", "source_ref", "source_license", "author_role"],
+          "properties": {
+            "source_type": { "type": "string", "minLength": 1 },
+            "source_ref": { "type": "string", "minLength": 1 },
+            "source_license": { "type": "string", "minLength": 1 },
+            "author_role": { "type": "string", "minLength": 1 }
+          }
+        },
+        "audit": {
+          "type": "object",
+          "required": ["content_status", "review_status", "authored_by", "reviewed_by"],
+          "properties": {
+            "content_status": {
+              "type": "string",
+              "enum": ["authored", "revised"]
+            },
+            "review_status": { "type": "string", "const": "approved" },
+            "authored_by": { "type": "string", "minLength": 1 },
+            "reviewed_by": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    }
+  }
+}

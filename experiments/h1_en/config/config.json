@@ -1,0 +1,199 @@
+{
+  "experiment_id": "h1_en",
+  "config_schema_version": "1.0.0",
+  "record_schema_version": "1.0.0",
+  "language": "en",
+  "stage": "A",
+  "stage_a_description": "Identifier and structure scaffold only. All content and provenance fields are null. No prompt text, no model calls, no activation or probe or steering code.",
+  "containment": {
+    "write_root": "experiments/h1_en/",
+    "modifies_existing_paths": false,
+    "notes": "Stage A creates no files and writes no references outside experiments/h1_en/. Pre-existing data/, src/, wrapper, and prompt trees are untouched."
+  },
+  "paths": {
+    "items": "experiments/h1_en/data/items.v1.jsonl",
+    "fpr": "experiments/h1_en/data/fpr.v1.jsonl",
+    "item_schema": "experiments/h1_en/schema/item.schema.json",
+    "fpr_schema": "experiments/h1_en/schema/fpr.schema.json"
+  },
+  "counts": {
+    "items": 70,
+    "fpr": 40
+  },
+  "item_structure": {
+    "domains": 7,
+    "families_per_domain": 2,
+    "families_total": 14,
+    "paraphrases_per_family": 5,
+    "item_id_pattern": "^h1_en-item-f(0[1-9]|1[0-4])-p0[1-5]$",
+    "family_id_pattern": "^f(0[1-9]|1[0-4])$",
+    "domain_id_pattern": "^dom0[1-7]$",
+    "family_to_domain": {
+      "f01": "dom01",
+      "f02": "dom01",
+      "f03": "dom02",
+      "f04": "dom02",
+      "f05": "dom03",
+      "f06": "dom03",
+      "f07": "dom04",
+      "f08": "dom04",
+      "f09": "dom05",
+      "f10": "dom05",
+      "f11": "dom06",
+      "f12": "dom06",
+      "f13": "dom07",
+      "f14": "dom07"
+    },
+    "identifier_semantics": "Domain and family identifiers are structural placeholders only. Topic labels are authored content and are assigned in Stage B, not here."
+  },
+  "item_content_policy": {
+    "frame_neutral_only": true,
+    "stored_core_fields": [
+      "nucleus",
+      "mcq_stem",
+      "options",
+      "answer_index",
+      "answer_free_form"
+    ],
+    "forbidden_in_item_records": [
+      "eval_prompt",
+      "deploy_prompt",
+      "eval_prose",
+      "eval_mcq",
+      "deploy_prose",
+      "deploy_mcq",
+      "rendered_prompt",
+      "system",
+      "user"
+    ],
+    "enforcement": "Both the record object and core use additionalProperties: false, so any framing or prompt key fails schema validation in every stage."
+  },
+  "rendered_variants": {
+    "definition": "The four rendered variants are the cross product of frame and format. They are produced at render time from one frame-neutral item plus one frame template. They are never stored as fields inside item records.",
+    "frames": ["eval", "deploy"],
+    "formats": ["prose", "mcq"],
+    "variants": [
+      {
+        "variant_id": "eval_prose",
+        "frame": "eval",
+        "format": "prose",
+        "uses_item_fields": ["core.nucleus", "core.answer_free_form"],
+        "template_ref": null
+      },
+      {
+        "variant_id": "eval_mcq",
+        "frame": "eval",
+        "format": "mcq",
+        "uses_item_fields": ["core.mcq_stem", "core.options", "core.answer_index"],
+        "template_ref": null
+      },
+      {
+        "variant_id": "deploy_prose",
+        "frame": "deploy",
+        "format": "prose",
+        "uses_item_fields": ["core.nucleus", "core.answer_free_form"],
+        "template_ref": null
+      },
+      {
+        "variant_id": "deploy_mcq",
+        "frame": "deploy",
+        "format": "mcq",
+        "uses_item_fields": ["core.mcq_stem", "core.options", "core.answer_index"],
+        "template_ref": null
+      }
+    ],
+    "template_authoring_stage": "B",
+    "rendered_stimuli_per_item": 4,
+    "rendered_stimuli_total": 280
+  },
+  "fpr_structure": {
+    "count": 40,
+    "fpr_id_pattern": "^h1_en-fpr-(eval|deploy)-(prose|mcq)-(0[1-9]|10)$",
+    "expected_labels": ["eval", "deploy"],
+    "formats": ["prose", "mcq"],
+    "cells": [
+      { "expected_label": "eval", "format": "prose", "count": 10 },
+      { "expected_label": "eval", "format": "mcq", "count": 10 },
+      { "expected_label": "deploy", "format": "prose", "count": 10 },
+      { "expected_label": "deploy", "format": "mcq", "count": 10 }
+    ],
+    "message_fields": {
+      "system": null,
+      "user": null,
+      "rationale": "system and user are separate null fields so that system-position and user-position framing cues can be manipulated and ablated independently."
+    },
+    "domain_id_in_stage_a": null,
+    "domain_id_assignment_stage": "B"
+  },
+  "splits": {
+    "stage_a_value": null,
+    "assignment_stage": "B",
+    "assignment_unit": "family",
+    "unit_rationale": "All five paraphrases of a family share one semantic nucleus; splitting per item would leak content across splits.",
+    "item_quotas": { "train": 35, "val": 15, "test": 20 },
+    "family_quotas": { "train": 7, "val": 3, "test": 4 },
+    "domain_spanning_allowed": true,
+    "domain_spanning_note": "A domain holds two families and may span splits. If domain-level isolation is required, Stage B must revise this structural plan explicitly rather than reinterpret these quotas.",
+    "fpr_split_policy": "Deferred to Stage B and constrained to be consistent with the item split assignment."
+  },
+  "stage_a_nulls": {
+    "null_fields": [
+      "split",
+      "core.nucleus",
+      "core.mcq_stem",
+      "core.options[*]",
+      "core.answer_index",
+      "core.answer_free_form",
+      "system",
+      "user",
+      "fpr.domain_id",
+      "provenance.*"
+    ],
+    "populated_fields": [
+      "schema_version",
+      "item_id",
+      "fpr_id",
+      "language",
+      "item.domain_id",
+      "family_id",
+      "paraphrase_index",
+      "format",
+      "expected_label",
+      "audit.stage",
+      "audit.content_status",
+      "audit.review_status"
+    ],
+    "provenance_shape_note": "provenance is an object whose keys are all null, so Stage C can require each key to be non-null without changing the record shape. No sources, licenses, dates, or authors are invented."
+  },
+  "validation_gates": {
+    "stage_a": [
+      "items file has exactly 70 lines; fpr file has exactly 40 lines",
+      "every record validates against its schema",
+      "item_id and fpr_id are unique and match the documented patterns",
+      "family_to_domain mapping holds for every item",
+      "each family has exactly 5 paraphrase_index values 1..5",
+      "each of the 4 FPR cells has exactly 10 records",
+      "split is null in all 110 records",
+      "all content fields and all provenance fields are null"
+    ],
+    "stage_b": [
+      "split populated for all 110 records under family-level assignment and the 35/15/20 item quotas",
+      "fpr domain_id populated or documented as intentionally domain-free",
+      "frame templates authored under experiments/h1_en/ and template_ref populated for all four variants"
+    ],
+    "stage_c": [
+      "apply $defs.stage_c_item_requirements to every item record",
+      "apply $defs.stage_c_fpr_requirements to every fpr record",
+      "records still holding Stage A nulls must fail",
+      "provenance keys non-null and reviewed",
+      "audit.content_status is authored and audit.review_status is approved"
+    ]
+  },
+  "non_goals": [
+    "authored items, stems, options, answers, or probe text",
+    "invented or placeholder provenance",
+    "model calls, API clients, generation or inference code",
+    "activation capture, probe training, steering code",
+    "any write outside experiments/h1_en/"
+  ]
+}

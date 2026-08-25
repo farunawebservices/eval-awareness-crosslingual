@@ -1,0 +1,375 @@
+FILE: experiments/h1_en/README.md
+# H1 (English) — Stage A scaffold
+
+Stage A creates only the experiment skeleton for the English H1 study:
+directory layout, configuration, JSON Schemas, and empty dataset files with
+fixed identifiers. No dataset text, activations, probes, steering, or reports
+are produced in this stage.
+
+## Scope of Stage A
+
+- `config/config.json` — frozen experiment configuration and recorded metadata.
+- `schema/item.schema.json` — schema for one semantic-item record.
+- `schema/fpr.schema.json` — schema for one false-positive-rate (FPR) record.
+- `data/items.v1.jsonl` — 70 item records, all content fields `null`.
+- `data/fpr.v1.jsonl` — 40 FPR records, all content fields `null`.
+
+Nothing outside `experiments/h1_en/` is created or modified.
+
+## Dataset shape
+
+- 70 semantic items, ids `en_h1_i001` … `en_h1_i070`.
+- Each item carries exactly four variants: `eval_prose`, `deploy_prose`,
+  `eval_mcq`, `deploy_mcq` (condition × format), i.e. 280 variants total once
+  populated in a later stage.
+- Variant identifiers are derived, not stored: `<item_id>__<variant_key>`.
+- 40 FPR records, ids `en_h1_f001` … `en_h1_f040`, each with
+  `expected_label = "non_eval"`.
+
+## Splits
+
+Splits are assigned at the **item** level, so all four variants of an item
+share one split. In Stage A every `split` field is `null`; the intended ratios
+and counts are recorded in `config/config.json` only. FPR records are intended
+to be used as a held-out set and also carry `split: null` in Stage A.
+
+## Model metadata
+
+`Qwen/Qwen2.5-7B-Instruct` is recorded in the configuration as metadata for
+later stages. Stage A does not load, download, or run any model.
+
+## Invariants to check before Stage B
+
+1. `data/items.v1.jsonl` has exactly 70 lines; ids are unique and contiguous.
+2. `data/fpr.v1.jsonl` has exactly 40 lines; ids are unique and contiguous.
+3. Every record validates against its schema in `schema/`.
+4. Every `prompt`, `options`, `answer`, `domain`, `category`, `format`,
+   `source`, `notes`, and `split` value is `null`.
+END FILE
+
+FILE: experiments/h1_en/config/config.json
+{
+  "experiment_id": "h1_en",
+  "schema_version": "1.0",
+  "stage": "A",
+  "stage_a_scope": [
+    "directory_layout",
+    "config",
+    "schemas",
+    "empty_dataset_skeleton"
+  ],
+  "language": "en",
+  "hypothesis_id": "H1",
+  "hypothesis_summary": "English evaluation-vs-deployment framing is linearly represented in model activations and is separable across prose and MCQ formats.",
+  "model": {
+    "name": "Qwen/Qwen2.5-7B-Instruct",
+    "revision": null,
+    "role": "recorded_metadata_only",
+    "loaded_in_stage_a": false,
+    "note": "Metadata for later stages; Stage A performs no model loading or inference."
+  },
+  "dataset": {
+    "items_file": "data/items.v1.jsonl",
+    "fpr_file": "data/fpr.v1.jsonl",
+    "items_schema": "schema/item.schema.json",
+    "fpr_schema": "schema/fpr.schema.json",
+    "n_items": 70,
+    "n_fpr": 40,
+    "conditions": ["eval", "deploy"],
+    "formats": ["prose", "mcq"],
+    "variant_keys": ["eval_prose", "deploy_prose", "eval_mcq", "deploy_mcq"],
+    "variants_per_item": 4,
+    "n_variants_expected": 280,
+    "variant_id_template": "{item_id}__{variant_key}",
+    "item_id_prefix": "en_h1_i",
+    "fpr_id_prefix": "en_h1_f",
+    "item_id_range": ["en_h1_i001", "en_h1_i070"],
+    "fpr_id_range": ["en_h1_f001", "en_h1_f040"],
+    "content_populated": false,
+    "content_null_in_stage_a": true
+  },
+  "splits": {
+    "unit": "item",
+    "assignment_state": "pending",
+    "values_in_stage_a": null,
+    "names": ["train", "val", "test"],
+    "ratios": {
+      "train": 0.6,
+      "val": 0.2,
+      "test": 0.2
+    },
+    "planned_item_counts": {
+      "train": 42,
+      "val": 14,
+      "test": 14
+    },
+    "seed": 20240501,
+    "constraint": "All four variants of an item share the item's split.",
+    "fpr_planned_use": "held_out_only"
+  },
+  "validation": {
+    "expected_item_lines": 70,
+    "expected_fpr_lines": 40,
+    "require_unique_ids": true,
+    "require_contiguous_ids": true,
+    "require_schema_valid": true,
+    "require_all_content_null": true
+  },
+  "provenance": {
+    "repository_root": "/workspace/eval-awareness-crosslingual",
+    "experiment_root": "experiments/h1_en",
+    "modifies_existing_paths": false,
+    "created_by_stage": "A"
+  }
+}
+END FILE
+
+FILE: experiments/h1_en/schema/item.schema.json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "experiments/h1_en/schema/item.schema.json",
+  "title": "H1 English semantic item",
+  "description": "One semantic item with four conceptual variants: condition (eval/deploy) x format (prose/MCQ). Stage A records carry null content.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "item_id",
+    "schema_version",
+    "language",
+    "split",
+    "domain",
+    "source",
+    "variants",
+    "notes"
+  ],
+  "properties": {
+    "item_id": {
+      "type": "string",
+      "pattern": "^en_h1_i0(0[1-9]|[1-6][0-9]|70)$"
+    },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "language": {
+      "const": "en"
+    },
+    "split": {
+      "description": "Item-level split; null until assigned in a later stage.",
+      "enum": ["train", "val", "test", null]
+    },
+    "domain": {
+      "type": ["string", "null"]
+    },
+    "source": {
+      "type": ["string", "null"]
+    },
+    "notes": {
+      "type": ["string", "null"]
+    },
+    "variants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["eval_prose", "deploy_prose", "eval_mcq", "deploy_mcq"],
+      "properties": {
+        "eval_prose": { "$ref": "#/$defs/proseVariant" },
+        "deploy_prose": { "$ref": "#/$defs/proseVariant" },
+        "eval_mcq": { "$ref": "#/$defs/mcqVariant" },
+        "deploy_mcq": { "$ref": "#/$defs/mcqVariant" }
+      }
+    }
+  },
+  "$defs": {
+    "proseVariant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["prompt"],
+      "properties": {
+        "prompt": { "type": ["string", "null"] }
+      }
+    },
+    "mcqVariant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["prompt", "options", "answer"],
+      "properties": {
+        "prompt": { "type": ["string", "null"] },
+        "options": {
+          "type": ["array", "null"],
+          "minItems": 2,
+          "items": { "type": "string" }
+        },
+        "answer": { "type": ["string", "null"] }
+      }
+    }
+  }
+}
+END FILE
+
+FILE: experiments/h1_en/schema/fpr.schema.json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "experiments/h1_en/schema/fpr.schema.json",
+  "title": "H1 English false-positive-rate record",
+  "description": "One benign non-evaluation prompt used to measure false positives. Stage A records carry null content.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "fpr_id",
+    "schema_version",
+    "language",
+    "split",
+    "category",
+    "format",
+    "prompt",
+    "expected_label",
+    "notes"
+  ],
+  "properties": {
+    "fpr_id": {
+      "type": "string",
+      "pattern": "^en_h1_f0(0[1-9]|[1-3][0-9]|40)$"
+    },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "language": {
+      "const": "en"
+    },
+    "split": {
+      "description": "Item-level split; null until assigned in a later stage.",
+      "enum": ["train", "val", "test", null]
+    },
+    "category": {
+      "type": ["string", "null"]
+    },
+    "format": {
+      "enum": ["prose", "mcq", null]
+    },
+    "prompt": {
+      "type": ["string", "null"]
+    },
+    "expected_label": {
+      "const": "non_eval"
+    },
+    "notes": {
+      "type": ["string", "null"]
+    }
+  }
+}
+END FILE
+
+FILE: experiments/h1_en/data/items.v1.jsonl
+{"item_id":"en_h1_i001","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i002","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i003","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i004","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i005","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i006","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i007","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i008","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i009","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i010","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i011","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i012","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i013","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i014","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i015","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i016","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i017","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i018","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i019","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i020","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i021","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i022","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i023","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i024","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i025","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i026","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i027","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i028","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i029","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i030","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i031","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i032","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i033","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i034","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i035","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i036","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i037","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i038","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i039","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i040","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i041","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i042","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i043","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i044","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i045","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i046","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i047","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i048","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i049","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i050","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i051","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i052","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i053","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i054","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i055","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i056","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i057","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i058","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i059","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i060","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i061","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i062","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i063","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i064","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i065","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i066","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i067","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i068","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i069","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+{"item_id":"en_h1_i070","schema_version":"1.0","language":"en","split":null,"domain":null,"source":null,"variants":{"eval_prose":{"prompt":null},"deploy_prose":{"prompt":null},"eval_mcq":{"prompt":null,"options":null,"answer":null},"deploy_mcq":{"prompt":null,"options":null,"answer":null}},"notes":null}
+END FILE
+
+FILE: experiments/h1_en/data/fpr.v1.jsonl
+{"fpr_id":"en_h1_f001","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f002","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f003","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f004","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f005","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f006","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f007","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f008","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f009","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f010","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f011","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f012","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f013","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f014","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f015","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f016","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f017","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f018","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f019","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f020","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f021","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f022","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f023","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f024","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f025","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f026","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f027","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f028","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f029","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f030","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f031","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f032","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f033","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f034","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f035","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f036","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f037","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f038","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f039","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+{"fpr_id":"en_h1_f040","schema_version":"1.0","language":"en","split":null,"category":null,"format":null,"prompt":null,"expected_label":"non_eval","notes":null}
+END FILE

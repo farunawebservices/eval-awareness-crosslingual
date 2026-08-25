@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "experiments/h1_en/schema/fpr.schema.json",
+  "title": "h1_en FPR (frame-prior recognition) record",
+  "description": "Stage A permissive schema for one FPR probe. It admits the Stage A null skeleton. It is NOT sufficient for analysis: Stage C validation MUST additionally apply $defs.stage_c_fpr_requirements, which forbids the Stage A nulls. system and user are separate fields so system-position and user-position framing cues can be manipulated and ablated independently.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "fpr_id",
+    "language",
+    "domain_id",
+    "format",
+    "split",
+    "expected_label",
+    "system",
+    "user",
+    "provenance",
+    "audit"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "fpr_id": {
+      "description": "Populated in Stage A. Pattern h1_en-fpr-<label>-<format>-<NN>.",
+      "type": "string",
+      "pattern": "^h1_en-fpr-(eval|deploy)-(prose|mcq)-(0[1-9]|10)$"
+    },
+    "language": {
+      "type": "string",
+      "const": "en"
+    },
+    "domain_id": {
+      "description": "Null in Stage A: FPR probes are not yet tied to item domains. Assigned or documented as domain-free in Stage B.",
+      "type": ["string", "null"],
+      "pattern": "^dom0[1-7]$"
+    },
+    "format": {
+      "type": "string",
+      "enum": ["prose", "mcq"]
+    },
+    "split": {
+      "description": "Null in Stage A. Assigned in Stage B, consistent with the item split assignment.",
+      "type": ["string", "null"],
+      "enum": [null, "train", "val", "test"]
+    },
+    "expected_label": {
+      "description": "Populated in Stage A: a design constant of the 2x2 cell layout, not authored content.",
+      "type": "string",
+      "enum": ["eval", "deploy"]
+    },
+    "system": {
+      "description": "System-position probe text. Null in Stage A.",
+      "type": ["string", "null"]
+    },
+    "user": {
+      "description": "User-position probe text. Null in Stage A.",
+      "type": ["string", "null"]
+    },
+    "provenance": {
+      "description": "All keys null in Stage A. No sources, licenses, dates, or authors are invented.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_type",
+        "source_ref",
+        "source_license",
+        "retrieved_at",
+        "author_role",
+        "notes"
+      ],
+      "properties": {
+        "source_type": { "type": ["string", "null"] },
+        "source_ref": { "type": ["string", "null"] },
+        "source_license": { "type": ["string", "null"] },
+        "retrieved_at": { "type": ["string", "null"] },
+        "author_role": { "type": ["string", "null"] },
+        "notes": { "type": ["string", "null"] }
+      }
+    },
+    "audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stage",
+        "content_status",
+        "authored_by",
+        "reviewed_by",
+        "review_status",
+        "notes"
+      ],
+      "properties": {
+        "stage": {
+          "type": "string",
+          "enum": ["A", "B", "C"]
+        },
+        "content_status": {
+          "type": "string",
+          "enum": ["skeleton", "authored", "revised"]
+        },
+        "authored_by": { "type": ["string", "null"] },
+        "reviewed_by": { "type": ["string", "null"] },
+        "review_status": {
+          "type": "string",
+          "enum": ["pending", "in_review", "approved", "rejected"]
+        },
+        "notes": { "type": ["string", "null"] }
+      }
+    }
+  },
+  "$defs": {
+    "stage_c_fpr_requirements": {
+      "$comment": "BLOCKING at Stage C. Apply as an additional schema (allOf) alongside this file. A record that still carries the Stage A null skeleton MUST fail here.",
+      "title": "h1_en FPR record, Stage C content requirements",
+      "type": "object",
+      "required": ["split", "system", "user", "provenance", "audit"],
+      "properties": {
+        "split": {
+          "type": "string",
+          "enum": ["train", "val", "test"]
+        },
+        "system": { "type": "string", "minLength": 1 },
+        "user": { "type": "string", "minLength": 1 },
+        "provenance": {
+          "type": "object",
+          "required": ["source_type", "source_ref", "source_license", "author_role"],
+          "properties": {
+            "source_type": { "type": "string", "minLength": 1 },
+            "source_ref": { "type": "string", "minLength": 1 },
+            "source_license": { "type": "string", "minLength": 1 },
+            "author_role": { "type": "string", "minLength": 1 }
+          }
+        },
+        "audit": {
+          "type": "object",
+          "required": ["content_status", "review_status", "authored_by", "reviewed_by"],
+          "properties": {
+            "content_status": {
+              "type": "string",
+              "enum": ["authored", "revised"]
+            },
+            "review_status": { "type": "string", "const": "approved" },
+            "authored_by": { "type": "string", "minLength": 1 },
+            "reviewed_by": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    }
+  }
+}

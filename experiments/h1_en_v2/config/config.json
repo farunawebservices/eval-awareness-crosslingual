@@ -1,0 +1,123 @@
+{
+  "config_id": "h1_en_v2",
+  "config_version": "v2.0.0-stageA",
+  "supersedes": "h1_en_v1_stageA_rejected",
+  "supersede_reason": "v1 used 14 semantic nuclei x 5 paraphrases and split at template-family level; both are prohibited in v2.",
+  "language": "en",
+  "stage": "A",
+  "stage_a_policy": {
+    "content_populated": false,
+    "prompt_text_stored": false,
+    "splits_assigned": false,
+    "all_content_fields_null": true,
+    "writes_restricted_to": "experiments/h1_en_v2/"
+  },
+  "main_dataset": {
+    "path": "experiments/h1_en_v2/data/items.v1.jsonl",
+    "schema": "experiments/h1_en_v2/schema/item.schema.json",
+    "record_count": 70,
+    "id_prefix": "h1en_v2_item_",
+    "id_first": "h1en_v2_item_001",
+    "id_last": "h1en_v2_item_070",
+    "unit_definition": "One record is one independent semantic nucleus.",
+    "paraphrases_allowed": false,
+    "paraphrase_policy": "Every item must be a distinct semantic nucleus. No item may be a paraphrase, restatement, or surface variant of another item.",
+    "allocation": {
+      "domains": 7,
+      "families": 5,
+      "items_per_cell": 2,
+      "cells": 35,
+      "total": 70,
+      "balance_requirement": "exactly 2 items in every (domain_id, family_id) cell"
+    },
+    "domains": [
+      { "domain_id": "D1", "label": null, "description": null },
+      { "domain_id": "D2", "label": null, "description": null },
+      { "domain_id": "D3", "label": null, "description": null },
+      { "domain_id": "D4", "label": null, "description": null },
+      { "domain_id": "D5", "label": null, "description": null },
+      { "domain_id": "D6", "label": null, "description": null },
+      { "domain_id": "D7", "label": null, "description": null }
+    ],
+    "families": [
+      { "family_id": "F1", "label": null, "description": null, "template_text": null },
+      { "family_id": "F2", "label": null, "description": null, "template_text": null },
+      { "family_id": "F3", "label": null, "description": null, "template_text": null },
+      { "family_id": "F4", "label": null, "description": null, "template_text": null },
+      { "family_id": "F5", "label": null, "description": null, "template_text": null }
+    ],
+    "id_allocation_map": {
+      "D1": { "F1": ["h1en_v2_item_001", "h1en_v2_item_002"], "F2": ["h1en_v2_item_003", "h1en_v2_item_004"], "F3": ["h1en_v2_item_005", "h1en_v2_item_006"], "F4": ["h1en_v2_item_007", "h1en_v2_item_008"], "F5": ["h1en_v2_item_009", "h1en_v2_item_010"] },
+      "D2": { "F1": ["h1en_v2_item_011", "h1en_v2_item_012"], "F2": ["h1en_v2_item_013", "h1en_v2_item_014"], "F3": ["h1en_v2_item_015", "h1en_v2_item_016"], "F4": ["h1en_v2_item_017", "h1en_v2_item_018"], "F5": ["h1en_v2_item_019", "h1en_v2_item_020"] },
+      "D3": { "F1": ["h1en_v2_item_021", "h1en_v2_item_022"], "F2": ["h1en_v2_item_023", "h1en_v2_item_024"], "F3": ["h1en_v2_item_025", "h1en_v2_item_026"], "F4": ["h1en_v2_item_027", "h1en_v2_item_028"], "F5": ["h1en_v2_item_029", "h1en_v2_item_030"] },
+      "D4": { "F1": ["h1en_v2_item_031", "h1en_v2_item_032"], "F2": ["h1en_v2_item_033", "h1en_v2_item_034"], "F3": ["h1en_v2_item_035", "h1en_v2_item_036"], "F4": ["h1en_v2_item_037", "h1en_v2_item_038"], "F5": ["h1en_v2_item_039", "h1en_v2_item_040"] },
+      "D5": { "F1": ["h1en_v2_item_041", "h1en_v2_item_042"], "F2": ["h1en_v2_item_043", "h1en_v2_item_044"], "F3": ["h1en_v2_item_045", "h1en_v2_item_046"], "F4": ["h1en_v2_item_047", "h1en_v2_item_048"], "F5": ["h1en_v2_item_049", "h1en_v2_item_050"] },
+      "D6": { "F1": ["h1en_v2_item_051", "h1en_v2_item_052"], "F2": ["h1en_v2_item_053", "h1en_v2_item_054"], "F3": ["h1en_v2_item_055", "h1en_v2_item_056"], "F4": ["h1en_v2_item_057", "h1en_v2_item_058"], "F5": ["h1en_v2_item_059", "h1en_v2_item_060"] },
+      "D7": { "F1": ["h1en_v2_item_061", "h1en_v2_item_062"], "F2": ["h1en_v2_item_063", "h1en_v2_item_064"], "F3": ["h1en_v2_item_065", "h1en_v2_item_066"], "F4": ["h1en_v2_item_067", "h1en_v2_item_068"], "F5": ["h1en_v2_item_069", "h1en_v2_item_070"] }
+    },
+    "core_fields_stage_a": {
+      "nucleus": null,
+      "mcq_stem": null,
+      "options": [null, null, null, null],
+      "answer_index": null,
+      "answer_free_form": null
+    },
+    "prompt_text_storage": {
+      "stored_in_item_records": false,
+      "rationale": "Item records hold only frame-neutral core content. Eval/deploy framing is applied by renderers outside the records."
+    }
+  },
+  "rendered_variants": {
+    "status": "conceptual_only",
+    "materialized_in_records": false,
+    "documented_in": ["experiments/h1_en_v2/config/config.json", "experiments/h1_en_v2/README.md"],
+    "count_per_item": 4,
+    "variants": [
+      { "variant_id": "eval_prose", "frame": "eval", "format": "prose", "template_text": null },
+      { "variant_id": "deploy_prose", "frame": "deploy", "format": "prose", "template_text": null },
+      { "variant_id": "eval_mcq", "frame": "eval", "format": "mcq", "options": 4, "template_text": null },
+      { "variant_id": "deploy_mcq", "frame": "deploy", "format": "mcq", "options": 4, "template_text": null }
+    ],
+    "note": "Frame axis (eval/deploy) and format axis (prose/mcq) are fully crossed. All four variants of an item inherit that item's split."
+  },
+  "splitting": {
+    "split_unit": "semantic_item",
+    "prohibited_split_units": ["template_family", "domain", "rendered_prompt", "prompt", "format", "frame", "paraphrase"],
+    "planned_quotas": { "train": 35, "val": 15, "test": 20, "total": 70 },
+    "stage_a_state": "all split fields are null",
+    "assignment_stage": "later stage (not Stage A)",
+    "requirements_at_assignment": [
+      "record the RNG seed",
+      "stratify across all 35 (domain_id, family_id) cells",
+      "verify no semantic item appears in more than one split",
+      "verify all four rendered variants of an item share the item's split"
+    ]
+  },
+  "fpr_dataset": {
+    "path": "experiments/h1_en_v2/data/fpr.v1.jsonl",
+    "schema": "experiments/h1_en_v2/schema/fpr.schema.json",
+    "record_count": 40,
+    "id_prefix": "h1en_v2_fpr_",
+    "id_first": "h1en_v2_fpr_001",
+    "id_last": "h1en_v2_fpr_040",
+    "locked": true,
+    "expected_label": "deploy",
+    "format": "prose",
+    "allowed_labels": ["deploy"],
+    "allowed_formats": ["prose"],
+    "prohibited_labels": ["eval"],
+    "prohibited_formats": ["mcq"],
+    "fields": { "system": null, "user": null },
+    "purpose": "Locked non-eval organic-style deploy prompts used only for later false-positive-rate measurement.",
+    "is_contrastive": false,
+    "contrastive_use_prohibited": true,
+    "split": null,
+    "in_train_val_test": false,
+    "split_note": "The FPR set is a held-out measurement set and is never a member of any train/val/test split."
+  },
+  "stage_gates": {
+    "stage_a": ["fixed counts", "fixed ID ranges", "balanced 7x5x2 allocation", "all content null", "all splits null"],
+    "stage_b": ["define domain semantics", "define family semantics", "define renderer templates for the four variants", "define split procedure and seed"],
+    "stage_c": ["populate all content fields", "human review recorded per record", "provenance recorded per record", "verify pairwise semantic distinctness of all 70 items"]
+  }
+}
