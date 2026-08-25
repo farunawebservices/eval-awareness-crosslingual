@@ -1,0 +1,20 @@
+{
+  "model_name": "Qwen/Qwen2.5-7B-Instruct",
+  "layers": [
+    12,
+    16,
+    20,
+    24
+  ],
+  "hidden_size": 3584,
+  "record_count": 280,
+  "label_counts": {
+    "1": 140,
+    "0": 140
+  },
+  "split_counts": {
+    "train": 140,
+    "val": 60,
+    "test": 80
+  }
+}

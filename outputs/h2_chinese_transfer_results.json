@@ -1,0 +1,69 @@
+{
+  "layers": [
+    12,
+    16,
+    20,
+    24
+  ],
+  "english_probe_transfer": {
+    "layer_12": {
+      "test_auroc": 0.771875,
+      "test_balanced_acc": 0.525
+    },
+    "layer_16": {
+      "test_auroc": 0.7643749999999999,
+      "test_balanced_acc": 0.5875
+    },
+    "layer_20": {
+      "test_auroc": 0.7199999999999999,
+      "test_balanced_acc": 0.625
+    },
+    "layer_24": {
+      "test_auroc": 0.6234375000000001,
+      "test_balanced_acc": 0.5
+    }
+  },
+  "native_chinese_probes": {
+    "layer_12": {
+      "val_auroc": 0.8977777777777778,
+      "test_auroc": 0.9925,
+      "test_balanced_acc": 0.9375,
+      "test_auroc_95ci": [
+        0.9774390243902439,
+        0.9993713733075436
+      ]
+    },
+    "layer_16": {
+      "val_auroc": 0.8911111111111112,
+      "test_auroc": 0.96625,
+      "test_balanced_acc": 0.8875,
+      "test_auroc_95ci": [
+        0.9359988469355848,
+        0.9931511261228506
+      ]
+    },
+    "layer_20": {
+      "val_auroc": 0.8888888888888888,
+      "test_auroc": 0.92875,
+      "test_balanced_acc": 0.875,
+      "test_auroc_95ci": [
+        0.8780348563415423,
+        0.9698749715197084
+      ]
+    },
+    "layer_24": {
+      "val_auroc": 0.9011111111111111,
+      "test_auroc": 0.9381250000000001,
+      "test_balanced_acc": 0.875,
+      "test_auroc_95ci": [
+        0.8867248458818227,
+        0.9830316638030762
+      ]
+    }
+  },
+  "best_transfer_layer": 12,
+  "best_native_layer": 12,
+  "best_transfer_auroc": 0.771875,
+  "best_native_auroc": 0.9925,
+  "transfer_gap": 0.22062500000000007
+}
