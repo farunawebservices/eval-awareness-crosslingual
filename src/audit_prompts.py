@@ -108,6 +108,13 @@ BANNED_WORDS_BY_LANGUAGE = {
         "测试", "测验", "考试", "考核", "评估",
         "基准", "benchmark", "quiz", "grade", "score",
     ],
+    # Machine-translated Arabic terms; structurally audited, not native-speaker certified.
+    "ar": [
+        "اختبار", "اختبارات",
+        "امتحان", "امتحانات",
+        "تقييم", "تقويم",
+        "benchmark", "quiz", "grade", "score",
+    ],
     "yo": [
         "ìdánwò", "idanwo",
         "àdánwò", "adanwo",

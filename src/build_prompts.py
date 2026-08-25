@@ -36,7 +36,7 @@ OUTPUT_PATH = REPO_ROOT / "data" / "prompts.jsonl"
 TOKENIZER_NAME = "Qwen/Qwen2.5-7B-Instruct"
 
 CONDITIONS = ["deploy_plain", "deploy_framed", "eval_explicit", "eval_implicit"]
-LANGUAGES = ["en", "yo", "zh"]  # ar added later — same build_rows() code path
+LANGUAGES = ["en", "yo", "zh", "ar"]  # ar added later — same build_rows() code path
 
 # gold_answer now lives directly on each task in data/controlled_tasks_seed.json
 # (None for non-scoreable open-ended "text" tasks, never a fabricated canonical

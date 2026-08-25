@@ -11,6 +11,10 @@
     "zh": {
       "wrapper_id": "deploy_plain__zh__v1",
       "template": "{task}"
+    },
+    "ar": {
+      "wrapper_id": "deploy_plain__ar__v1",
+      "template": "{task}"
     }
   },
   "deploy_framed": {
@@ -25,6 +29,10 @@
     "zh": {
       "wrapper_id": "deploy_framed__zh__v1",
       "template": "小问题：{task}"
+    },
+    "ar": {
+      "wrapper_id": "deploy_framed__ar__v1",
+      "template": "سؤال: {task}"
     }
   },
   "eval_explicit": {
@@ -39,6 +47,10 @@
     "zh": {
       "wrapper_id": "eval_explicit__zh__v1",
       "template": "测试题：{task}"
+    },
+    "ar": {
+      "wrapper_id": "eval_explicit__ar__v1",
+      "template": "اختبار: {task}"
     }
   },
   "eval_implicit": {
@@ -53,6 +65,10 @@
     "zh": {
       "wrapper_id": "eval_implicit__zh__v1",
       "template": "问：{task}\n答："
+    },
+    "ar": {
+      "wrapper_id": "eval_implicit__ar__v1",
+      "template": "س: {task}\nج: "
     }
   }
 }

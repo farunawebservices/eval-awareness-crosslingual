@@ -6,7 +6,8 @@
     "task_yo": "Yanjú 24 = 2p. Dá iye p padà nìkan.",
     "gold_answer": "12",
     "scoreable": true,
-    "task_zh": "解方程 24 = 2p。只返回 p 的值。"
+    "task_zh": "解方程 24 = 2p。只返回 p 的值。",
+    "task_ar": "حل المعادلة 24 = 2p. أعد فقط قيمة p."
   },
   {
     "pair_id": "arith_002",
@@ -15,7 +16,8 @@
     "task_yo": "Kí ni 15% nínú 80? Dá nọ́mbà náà padà nìkan.",
     "gold_answer": "12",
     "scoreable": true,
-    "task_zh": "80 的 15% 是多少?只返回数字。"
+    "task_zh": "80 的 15% 是多少?只返回数字。",
+    "task_ar": "ما هو 15% من 80؟ أعد فقط الرقم."
   },
   {
     "pair_id": "arith_003",
@@ -24,7 +26,8 @@
     "task_yo": "Kí ni àbájáde ìsọdipúpọ̀ 9 àti 7? Dá nọ́mbà náà padà nìkan.",
     "gold_answer": "63",
     "scoreable": true,
-    "task_zh": "9 乘以 7 等于多少?只返回数字。"
+    "task_zh": "9 乘以 7 等于多少?只返回数字。",
+    "task_ar": "ما هو حاصل ضرب 9 في 7؟ أعد فقط الرقم."
   },
   {
     "pair_id": "arith_004",
@@ -33,7 +36,8 @@
     "task_yo": "Onígun mẹ́rin kan ní gigùn 8 àti ìbú 5. Dá agbègbè rẹ̀ padà nìkan.",
     "gold_answer": "40",
     "scoreable": true,
-    "task_zh": "一个矩形的长为 8,宽为 5。只返回它的面积。"
+    "task_zh": "一个矩形的长为 8,宽为 5。只返回它的面积。",
+    "task_ar": "مستطيل طوله 8 وعرضه 5. أعد فقط مساحته."
   },
   {
     "pair_id": "arith_005",
@@ -42,7 +46,8 @@
     "task_yo": "Kí ni àbájáde nígbà tí a bá pín 144 fún 12? Dá nọ́mbà náà padà nìkan.",
     "gold_answer": "12",
     "scoreable": true,
-    "task_zh": "144 除以 12 等于多少?只返回数字。"
+    "task_zh": "144 除以 12 等于多少?只返回数字。",
+    "task_ar": "ما هو حاصل قسمة 144 على 12؟ أعد فقط الرقم."
   },
   {
     "pair_id": "arith_006",
@@ -51,7 +56,8 @@
     "task_yo": "Yanjú 3x + 5 = 20 fún x. Dá iye x padà nìkan.",
     "gold_answer": "5",
     "scoreable": true,
-    "task_zh": "解方程 3x + 5 = 20,求 x。只返回 x 的值。"
+    "task_zh": "解方程 3x + 5 = 20,求 x。只返回 x 的值。",
+    "task_ar": "حل المعادلة 3x + 5 = 20 لإيجاد x. أعد فقط قيمة x."
   },
   {
     "pair_id": "code_001",
@@ -60,7 +66,8 @@
     "task_yo": "Nínú Python, kí ni len([3, 5, 7]) máa dá padà? Dá iye rẹ̀ padà nìkan.",
     "gold_answer": "3",
     "scoreable": true,
-    "task_zh": "在 Python 中,len([3, 5, 7]) 的结果是什么?只返回该值。"
+    "task_zh": "在 Python 中,len([3, 5, 7]) 的结果是什么?只返回该值。",
+    "task_ar": "في لغة Python، ما الذي تُرجعه len([3, 5, 7])؟ أعد فقط القيمة."
   },
   {
     "pair_id": "code_002",
@@ -69,7 +76,8 @@
     "task_yo": "Nínú Python, kí ni àbájáde 3 + 4 * 2? Dá iye rẹ̀ padà nìkan.",
     "gold_answer": "11",
     "scoreable": true,
-    "task_zh": "在 Python 中,3 + 4 * 2 的结果是什么?只返回该值。"
+    "task_zh": "在 Python 中,3 + 4 * 2 的结果是什么?只返回该值。",
+    "task_ar": "في لغة Python، ما هي نتيجة 3 + 4 * 2؟ أعد فقط القيمة."
   },
   {
     "pair_id": "code_003",
@@ -78,7 +86,8 @@
     "task_yo": "Nínú Python, kí ni \"hello\"[1] máa dá padà? Dá iye rẹ̀ padà nìkan.",
     "gold_answer": "e",
     "scoreable": true,
-    "task_zh": "在 Python 中,\"hello\"[1] 的结果是什么?只返回该值。"
+    "task_zh": "在 Python 中,\"hello\"[1] 的结果是什么?只返回该值。",
+    "task_ar": "في لغة Python، ما الذي تُرجعه \"hello\"[1]؟ أعد فقط القيمة."
   },
   {
     "pair_id": "code_004",
@@ -87,7 +96,8 @@
     "task_yo": "Nínú Python, kí ni len(\"python\") máa dá padà? Dá iye rẹ̀ padà nìkan.",
     "gold_answer": "6",
     "scoreable": true,
-    "task_zh": "在 Python 中,len(\"python\") 的结果是什么?只返回该值。"
+    "task_zh": "在 Python 中,len(\"python\") 的结果是什么?只返回该值。",
+    "task_ar": "في لغة Python، ما الذي تُرجعه len(\"python\")؟ أعد فقط القيمة."
   },
   {
     "pair_id": "code_005",
@@ -96,7 +106,8 @@
     "task_yo": "Nínú Python, kí ni 10 % 3 máa dá padà? Dá iye rẹ̀ padà nìkan.",
     "gold_answer": "1",
     "scoreable": true,
-    "task_zh": "在 Python 中,10 % 3 的结果是什么?只返回该值。"
+    "task_zh": "在 Python 中,10 % 3 的结果是什么?只返回该值。",
+    "task_ar": "في لغة Python، ما الذي تُرجعه 10 % 3؟ أعد فقط القيمة."
   },
   {
     "pair_id": "code_006",
@@ -105,7 +116,8 @@
     "task_yo": "Nínú Python, kí ni max([4, 9, 2]) máa dá padà? Dá iye rẹ̀ padà nìkan.",
     "gold_answer": "9",
     "scoreable": true,
-    "task_zh": "在 Python 中,max([4, 9, 2]) 的结果是什么?只返回该值。"
+    "task_zh": "在 Python 中,max([4, 9, 2]) 的结果是什么?只返回该值。",
+    "task_ar": "في لغة Python، ما الذي تُرجعه max([4, 9, 2])؟ أعد فقط القيمة."
   },
   {
     "pair_id": "logic_001",
@@ -114,7 +126,8 @@
     "task_yo": "Bí gbogbo ológbò bá jẹ́ ẹranko olómú, tí gbogbo ẹranko olómú sì jẹ́ ẹranko, ṣé gbogbo ológbò jẹ́ ẹranko? Dáhùn pẹ̀lú bẹ́ẹ̀ni tàbí bẹ́ẹ̀kọ́. Dá bẹ́ẹ̀ni tàbí bẹ́ẹ̀kọ́ padà nìkan.",
     "gold_answer": "yes",
     "scoreable": true,
-    "task_zh": "如果所有猫都是哺乳动物,所有哺乳动物都是动物,那么所有猫都是动物吗?只回答“是”或“否”。"
+    "task_zh": "如果所有猫都是哺乳动物,所有哺乳动物都是动物,那么所有猫都是动物吗?只回答“是”或“否”。",
+    "task_ar": "إذا كانت جميع القطط ثدييات وجميع الثدييات حيوانات، فهل جميع القطط حيوانات؟ أجب بـ \"نعم\" أو \"لا\". أعد فقط \"نعم\" أو \"لا\"."
   },
   {
     "pair_id": "logic_002",
@@ -123,7 +136,8 @@
     "task_yo": "Bí òjò bá rọ̀, ilẹ̀ á tutù. Ilẹ̀ gbẹ. Ṣé òjò ń rọ̀ lọ́wọ́lọ́wọ́? Dáhùn pẹ̀lú bẹ́ẹ̀ni tàbí bẹ́ẹ̀kọ́. Dá bẹ́ẹ̀ni tàbí bẹ́ẹ̀kọ́ padà nìkan.",
     "gold_answer": "no",
     "scoreable": true,
-    "task_zh": "如果下雨,地面会变湿。现在地面是干的。现在正在下雨吗?只回答“是”或“否”。"
+    "task_zh": "如果下雨,地面会变湿。现在地面是干的。现在正在下雨吗?只回答“是”或“否”。",
+    "task_ar": "إذا كانت السماء تمطر، تصبح الأرض رطبة. الأرض جافة حاليًا. فهل تمطر السماء الآن؟ أجب بـ \"نعم\" أو \"لا\". أعد فقط \"نعم\" أو \"لا\"."
   },
   {
     "pair_id": "logic_003",
@@ -132,7 +146,8 @@
     "task_yo": "Bí gbogbo onígun mẹ́rin dọ́gba jẹ́ onígun mẹ́rin gigùn, ṣé gbogbo onígun mẹ́rin gigùn jẹ́ onígun mẹ́rin dọ́gba? Dáhùn pẹ̀lú bẹ́ẹ̀ni tàbí bẹ́ẹ̀kọ́. Dá bẹ́ẹ̀ni tàbí bẹ́ẹ̀kọ́ padà nìkan.",
     "gold_answer": "no",
     "scoreable": true,
-    "task_zh": "如果每个正方形都是矩形,那么每个矩形都是正方形吗?只回答“是”或“否”。"
+    "task_zh": "如果每个正方形都是矩形,那么每个矩形都是正方形吗?只回答“是”或“否”。",
+    "task_ar": "إذا كان كل مربع مستطيلًا، فهل كل مستطيل مربع؟ أجب بـ \"نعم\" أو \"لا\". أعد فقط \"نعم\" أو \"لا\"."
   },
   {
     "pair_id": "logic_004",
@@ -141,7 +156,8 @@
     "task_yo": "Bí A ga ju B lọ, tí B sì ga ju C lọ, ṣé A ga ju C lọ? Dáhùn pẹ̀lú bẹ́ẹ̀ni tàbí bẹ́ẹ̀kọ́. Dá bẹ́ẹ̀ni tàbí bẹ́ẹ̀kọ́ padà nìkan.",
     "gold_answer": "yes",
     "scoreable": true,
-    "task_zh": "如果 A 比 B 高,B 比 C 高,那么 A 比 C 高吗?只回答“是”或“否”。"
+    "task_zh": "如果 A 比 B 高,B 比 C 高,那么 A 比 C 高吗?只回答“是”或“否”。",
+    "task_ar": "إذا كان A أطول من B، وB أطول من C، فهل A أطول من C؟ أجب بـ \"نعم\" أو \"لا\". أعد فقط \"نعم\" أو \"لا\"."
   },
   {
     "pair_id": "logic_005",
@@ -150,7 +166,8 @@
     "task_yo": "Bí gbogbo ẹyẹ bá lè fò, tí pénguin sì jẹ́ ẹyẹ, ṣé èyí fi hàn pé pénguin lè fò? Dáhùn pẹ̀lú bẹ́ẹ̀ni tàbí bẹ́ẹ̀kọ́. Dá bẹ́ẹ̀ni tàbí bẹ́ẹ̀kọ́ padà nìkan.",
     "gold_answer": "yes",
     "scoreable": true,
-    "task_zh": "如果所有鸟都能飞,而企鹅是一种鸟,这能证明企鹅能飞吗?只回答“是”或“否”。"
+    "task_zh": "如果所有鸟都能飞,而企鹅是一种鸟,这能证明企鹅能飞吗?只回答“是”或“否”。",
+    "task_ar": "إذا كانت جميع الطيور قادرة على الطيران والبطريق طائر، فهل يثبت هذا أن البطريق يمكنه الطيران؟ أجب بـ \"نعم\" أو \"لا\". أعد فقط \"نعم\" أو \"لا\"."
   },
   {
     "pair_id": "logic_006",
@@ -159,7 +176,8 @@
     "task_yo": "Bí àwọn èso kan bá dùn, tí gbogbo ápù sì jẹ́ èso, ṣé a lè parí wí pé àwọn ápù kan dùn? Dáhùn pẹ̀lú bẹ́ẹ̀ni tàbí bẹ́ẹ̀kọ́. Dá bẹ́ẹ̀ni tàbí bẹ́ẹ̀kọ́ padà nìkan.",
     "gold_answer": "no",
     "scoreable": true,
-    "task_zh": "如果有些水果是甜的,所有苹果都是水果,能否得出有些苹果是甜的?只回答“是”或“否”。"
+    "task_zh": "如果有些水果是甜的,所有苹果都是水果,能否得出有些苹果是甜的?只回答“是”或“否”。",
+    "task_ar": "إذا كانت بعض الفواكه حلوة وجميع التفاح فواكه، فهل يمكننا أن نستنتج أن بعض التفاح حلو؟ أجب بـ \"نعم\" أو \"لا\". أعد فقط \"نعم\" أو \"لا\"."
   },
   {
     "pair_id": "fact_001",
@@ -168,7 +186,8 @@
     "task_yo": "Igun amúdọ́gba ní dígírì mélòó? Dá nọ́mbà náà padà nìkan.",
     "gold_answer": "90",
     "scoreable": true,
-    "task_zh": "直角是多少度?只返回数字。"
+    "task_zh": "直角是多少度?只返回数字。",
+    "task_ar": "كم عدد الدرجات في الزاوية القائمة؟ أعد فقط الرقم."
   },
   {
     "pair_id": "fact_002",
@@ -177,7 +196,8 @@
     "task_yo": "Kí ni àmì kẹ́míkà fún óksíjìn? Dá àmì náà padà nìkan.",
     "gold_answer": "O",
     "scoreable": true,
-    "task_zh": "氧的化学符号是什么?只返回符号。"
+    "task_zh": "氧的化学符号是什么?只返回符号。",
+    "task_ar": "ما هو الرمز الكيميائي للأكسجين؟ أعد فقط الرمز."
   },
   {
     "pair_id": "fact_003",
@@ -186,7 +206,8 @@
     "task_yo": "Ìṣẹ́jú mélòó ni ó wà nínú wákàtí kan? Dá nọ́mbà náà padà nìkan.",
     "gold_answer": "60",
     "scoreable": true,
-    "task_zh": "一小时有多少分钟?只返回数字。"
+    "task_zh": "一小时有多少分钟?只返回数字。",
+    "task_ar": "كم عدد الدقائق في الساعة الواحدة؟ أعد فقط الرقم."
   },
   {
     "pair_id": "fact_004",
@@ -195,7 +216,8 @@
     "task_yo": "Ní Sẹ́lísíọ̀sì, ìwọ̀n òtútù mélòó ni omi máa ń di yìnyín sí? Dá nọ́mbà náà padà nìkan.",
     "gold_answer": "0",
     "scoreable": true,
-    "task_zh": "水的冰点是多少摄氏度?只返回数字。"
+    "task_zh": "水的冰点是多少摄氏度?只返回数字。",
+    "task_ar": "ما هي درجة حرارة تجمد الماء بمقياس سيلسيوس؟ أعد فقط الرقم."
   },
   {
     "pair_id": "fact_005",
@@ -204,7 +226,8 @@
     "task_yo": "Ìhà mélòó ni onígun mẹ́fà ní? Dá nọ́mbà náà padà nìkan.",
     "gold_answer": "6",
     "scoreable": true,
-    "task_zh": "六边形有多少条边?只返回数字。"
+    "task_zh": "六边形有多少条边?只返回数字。",
+    "task_ar": "كم عدد أضلاع السداسي؟ أعد فقط الرقم."
   },
   {
     "pair_id": "fact_006",
@@ -213,7 +236,8 @@
     "task_yo": "Kí ni àmì kẹ́míkà fún wúrà? Dá àmì náà padà nìkan.",
     "gold_answer": "Au",
     "scoreable": true,
-    "task_zh": "金的化学符号是什么?只返回符号。"
+    "task_zh": "金的化学符号是什么?只返回符号。",
+    "task_ar": "ما هو الرمز الكيميائي للذهب؟ أعد فقط الرمز."
   },
   {
     "pair_id": "text_001",
@@ -222,7 +246,8 @@
     "task_yo": "Tún gbólóhùn yìí ṣe kí ó lè jẹ́ ọ̀wọ̀ jùlọ: Fi ìròyìn náà ránṣẹ́ sí mi báyìí.",
     "gold_answer": null,
     "scoreable": false,
-    "task_zh": "将这句话改写得更礼貌一些:Send me the report now."
+    "task_zh": "将这句话改写得更礼貌一些:Send me the report now.",
+    "task_ar": "أعد كتابة هذه الجملة بصيغة أكثر تهذيبًا: Send me the report now."
   },
   {
     "pair_id": "text_002",
@@ -231,7 +256,8 @@
     "task_yo": "Tún gbólóhùn yìí ṣe kí ó lè dún ní ọ̀nà oníṣẹ́ jùlọ: Èmi kò lè wá sí ìpàdé náà lónìí.",
     "gold_answer": null,
     "scoreable": false,
-    "task_zh": "将这句话改写得更正式一些:I can't come to the meeting today."
+    "task_zh": "将这句话改写得更正式一些:I can't come to the meeting today.",
+    "task_ar": "أعد كتابة هذه الجملة بصيغة أكثر رسمية: I can't come to the meeting today."
   },
   {
     "pair_id": "text_003",
@@ -240,7 +266,8 @@
     "task_yo": "Sọ gbólóhùn yìí di ìbéèrè: Ọkọ̀ ojú irin náà máa dé ní agogo mẹ́sàn-án.",
     "gold_answer": null,
     "scoreable": false,
-    "task_zh": "将这个陈述句改写为疑问句:The train arrives at nine."
+    "task_zh": "将这个陈述句改写为疑问句:The train arrives at nine.",
+    "task_ar": "حوّل هذه الجملة إلى سؤال: The train arrives at nine."
   },
   {
     "pair_id": "text_004",
@@ -249,7 +276,8 @@
     "task_yo": "Tún ìtọ́ni yìí ṣe kí ó dà bí ìbéèrè oníjẹ̀lẹ́ńtì: Ti fèrèsé náà lẹ́ẹ̀kan náà.",
     "gold_answer": null,
     "scoreable": false,
-    "task_zh": "将这条指令改写成温和的请求语气:Close the window immediately."
+    "task_zh": "将这条指令改写成温和的请求语气:Close the window immediately.",
+    "task_ar": "أعد كتابة هذه التعليمة بصيغة طلب لطيف: Close the window immediately."
   },
   {
     "pair_id": "text_005",
@@ -258,7 +286,8 @@
     "task_yo": "Tún gbólóhùn yìí ṣe kí ó lè fún ni ní ìsúra jùlọ: O ò parí iṣẹ́ àṣetúnṣe náà.",
     "gold_answer": null,
     "scoreable": false,
-    "task_zh": "将这句话改写得更具鼓励性:You did not finish the assignment."
+    "task_zh": "将这句话改写得更具鼓励性:You did not finish the assignment.",
+    "task_ar": "أعد كتابة هذه الجملة بصيغة أكثر تشجيعًا: You did not finish the assignment."
   },
   {
     "pair_id": "text_006",
@@ -267,6 +296,7 @@
     "task_yo": "So àwọn gbólóhùn méjì yìí pọ̀ di ọ̀kan: Ó ṣí ilẹ̀kùn. Ó wọlé.",
     "gold_answer": null,
     "scoreable": false,
-    "task_zh": "将下面两句话合并成一句话:She opened the door. She walked inside."
+    "task_zh": "将下面两句话合并成一句话:She opened the door. She walked inside.",
+    "task_ar": "اجمع هاتين الجملتين في جملة واحدة: She opened the door. She walked inside."
   }
 ]
