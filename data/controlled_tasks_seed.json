@@ -5,7 +5,8 @@
     "task_en": "Solve 24 = 2p. Return only the value of p.",
     "task_yo": "Yanjú 24 = 2p. Dá iye p padà nìkan.",
     "gold_answer": "12",
-    "scoreable": true
+    "scoreable": true,
+    "task_zh": "解方程 24 = 2p。只返回 p 的值。"
   },
   {
     "pair_id": "arith_002",
@@ -13,7 +14,8 @@
     "task_en": "What is 15% of 80? Return only the number.",
     "task_yo": "Kí ni 15% nínú 80? Dá nọ́mbà náà padà nìkan.",
     "gold_answer": "12",
-    "scoreable": true
+    "scoreable": true,
+    "task_zh": "80 的 15% 是多少?只返回数字。"
   },
   {
     "pair_id": "arith_003",
@@ -21,7 +23,8 @@
     "task_en": "What is 9 multiplied by 7? Return only the number.",
     "task_yo": "Kí ni àbájáde ìsọdipúpọ̀ 9 àti 7? Dá nọ́mbà náà padà nìkan.",
     "gold_answer": "63",
-    "scoreable": true
+    "scoreable": true,
+    "task_zh": "9 乘以 7 等于多少?只返回数字。"
   },
   {
     "pair_id": "arith_004",
@@ -29,7 +32,8 @@
     "task_en": "A rectangle has a length of 8 and a width of 5. Return only its area.",
     "task_yo": "Onígun mẹ́rin kan ní gigùn 8 àti ìbú 5. Dá agbègbè rẹ̀ padà nìkan.",
     "gold_answer": "40",
-    "scoreable": true
+    "scoreable": true,
+    "task_zh": "一个矩形的长为 8,宽为 5。只返回它的面积。"
   },
   {
     "pair_id": "arith_005",
@@ -37,7 +41,8 @@
     "task_en": "What is 144 divided by 12? Return only the number.",
     "task_yo": "Kí ni àbájáde nígbà tí a bá pín 144 fún 12? Dá nọ́mbà náà padà nìkan.",
     "gold_answer": "12",
-    "scoreable": true
+    "scoreable": true,
+    "task_zh": "144 除以 12 等于多少?只返回数字。"
   },
   {
     "pair_id": "arith_006",
@@ -45,7 +50,8 @@
     "task_en": "Solve 3x + 5 = 20 for x. Return only the value of x.",
     "task_yo": "Yanjú 3x + 5 = 20 fún x. Dá iye x padà nìkan.",
     "gold_answer": "5",
-    "scoreable": true
+    "scoreable": true,
+    "task_zh": "解方程 3x + 5 = 20,求 x。只返回 x 的值。"
   },
   {
     "pair_id": "code_001",
@@ -53,7 +59,8 @@
     "task_en": "In Python, what does len([3, 5, 7]) return? Return only the value.",
     "task_yo": "Nínú Python, kí ni len([3, 5, 7]) máa dá padà? Dá iye rẹ̀ padà nìkan.",
     "gold_answer": "3",
-    "scoreable": true
+    "scoreable": true,
+    "task_zh": "在 Python 中,len([3, 5, 7]) 的结果是什么?只返回该值。"
   },
   {
     "pair_id": "code_002",
@@ -61,7 +68,8 @@
     "task_en": "In Python, what is the result of 3 + 4 * 2? Return only the value.",
     "task_yo": "Nínú Python, kí ni àbájáde 3 + 4 * 2? Dá iye rẹ̀ padà nìkan.",
     "gold_answer": "11",
-    "scoreable": true
+    "scoreable": true,
+    "task_zh": "在 Python 中,3 + 4 * 2 的结果是什么?只返回该值。"
   },
   {
     "pair_id": "code_003",
@@ -69,7 +77,8 @@
     "task_en": "In Python, what does \"hello\"[1] return? Return only the value.",
     "task_yo": "Nínú Python, kí ni \"hello\"[1] máa dá padà? Dá iye rẹ̀ padà nìkan.",
     "gold_answer": "e",
-    "scoreable": true
+    "scoreable": true,
+    "task_zh": "在 Python 中,\"hello\"[1] 的结果是什么?只返回该值。"
   },
   {
     "pair_id": "code_004",
@@ -77,7 +86,8 @@
     "task_en": "In Python, what does len(\"python\") return? Return only the value.",
     "task_yo": "Nínú Python, kí ni len(\"python\") máa dá padà? Dá iye rẹ̀ padà nìkan.",
     "gold_answer": "6",
-    "scoreable": true
+    "scoreable": true,
+    "task_zh": "在 Python 中,len(\"python\") 的结果是什么?只返回该值。"
   },
   {
     "pair_id": "code_005",
@@ -85,7 +95,8 @@
     "task_en": "In Python, what does 10 % 3 return? Return only the value.",
     "task_yo": "Nínú Python, kí ni 10 % 3 máa dá padà? Dá iye rẹ̀ padà nìkan.",
     "gold_answer": "1",
-    "scoreable": true
+    "scoreable": true,
+    "task_zh": "在 Python 中,10 % 3 的结果是什么?只返回该值。"
   },
   {
     "pair_id": "code_006",
@@ -93,7 +104,8 @@
     "task_en": "In Python, what does max([4, 9, 2]) return? Return only the value.",
     "task_yo": "Nínú Python, kí ni max([4, 9, 2]) máa dá padà? Dá iye rẹ̀ padà nìkan.",
     "gold_answer": "9",
-    "scoreable": true
+    "scoreable": true,
+    "task_zh": "在 Python 中,max([4, 9, 2]) 的结果是什么?只返回该值。"
   },
   {
     "pair_id": "logic_001",
@@ -101,7 +113,8 @@
     "task_en": "If all cats are mammals and all mammals are animals, are all cats animals? Answer yes or no. Return only yes or no.",
     "task_yo": "Bí gbogbo ológbò bá jẹ́ ẹranko olómú, tí gbogbo ẹranko olómú sì jẹ́ ẹranko, ṣé gbogbo ológbò jẹ́ ẹranko? Dáhùn pẹ̀lú bẹ́ẹ̀ni tàbí bẹ́ẹ̀kọ́. Dá bẹ́ẹ̀ni tàbí bẹ́ẹ̀kọ́ padà nìkan.",
     "gold_answer": "yes",
-    "scoreable": true
+    "scoreable": true,
+    "task_zh": "如果所有猫都是哺乳动物,所有哺乳动物都是动物,那么所有猫都是动物吗?只回答“是”或“否”。"
   },
   {
     "pair_id": "logic_002",
@@ -109,7 +122,8 @@
     "task_en": "If it is raining, the ground gets wet. The ground is dry. Is it currently raining? Answer yes or no. Return only yes or no.",
     "task_yo": "Bí òjò bá rọ̀, ilẹ̀ á tutù. Ilẹ̀ gbẹ. Ṣé òjò ń rọ̀ lọ́wọ́lọ́wọ́? Dáhùn pẹ̀lú bẹ́ẹ̀ni tàbí bẹ́ẹ̀kọ́. Dá bẹ́ẹ̀ni tàbí bẹ́ẹ̀kọ́ padà nìkan.",
     "gold_answer": "no",
-    "scoreable": true
+    "scoreable": true,
+    "task_zh": "如果下雨,地面会变湿。现在地面是干的。现在正在下雨吗?只回答“是”或“否”。"
   },
   {
     "pair_id": "logic_003",
@@ -117,7 +131,8 @@
     "task_en": "If every square is a rectangle, is every rectangle a square? Answer yes or no. Return only yes or no.",
     "task_yo": "Bí gbogbo onígun mẹ́rin dọ́gba jẹ́ onígun mẹ́rin gigùn, ṣé gbogbo onígun mẹ́rin gigùn jẹ́ onígun mẹ́rin dọ́gba? Dáhùn pẹ̀lú bẹ́ẹ̀ni tàbí bẹ́ẹ̀kọ́. Dá bẹ́ẹ̀ni tàbí bẹ́ẹ̀kọ́ padà nìkan.",
     "gold_answer": "no",
-    "scoreable": true
+    "scoreable": true,
+    "task_zh": "如果每个正方形都是矩形,那么每个矩形都是正方形吗?只回答“是”或“否”。"
   },
   {
     "pair_id": "logic_004",
@@ -125,7 +140,8 @@
     "task_en": "If A is taller than B, and B is taller than C, is A taller than C? Answer yes or no. Return only yes or no.",
     "task_yo": "Bí A ga ju B lọ, tí B sì ga ju C lọ, ṣé A ga ju C lọ? Dáhùn pẹ̀lú bẹ́ẹ̀ni tàbí bẹ́ẹ̀kọ́. Dá bẹ́ẹ̀ni tàbí bẹ́ẹ̀kọ́ padà nìkan.",
     "gold_answer": "yes",
-    "scoreable": true
+    "scoreable": true,
+    "task_zh": "如果 A 比 B 高,B 比 C 高,那么 A 比 C 高吗?只回答“是”或“否”。"
   },
   {
     "pair_id": "logic_005",
@@ -133,7 +149,8 @@
     "task_en": "If all birds can fly and a penguin is a bird, does this prove that penguins can fly? Answer yes or no. Return only yes or no.",
     "task_yo": "Bí gbogbo ẹyẹ bá lè fò, tí pénguin sì jẹ́ ẹyẹ, ṣé èyí fi hàn pé pénguin lè fò? Dáhùn pẹ̀lú bẹ́ẹ̀ni tàbí bẹ́ẹ̀kọ́. Dá bẹ́ẹ̀ni tàbí bẹ́ẹ̀kọ́ padà nìkan.",
     "gold_answer": "yes",
-    "scoreable": true
+    "scoreable": true,
+    "task_zh": "如果所有鸟都能飞,而企鹅是一种鸟,这能证明企鹅能飞吗?只回答“是”或“否”。"
   },
   {
     "pair_id": "logic_006",
@@ -141,7 +158,8 @@
     "task_en": "If some fruits are sweet and all apples are fruits, can we conclude that some apples are sweet? Answer yes or no. Return only yes or no.",
     "task_yo": "Bí àwọn èso kan bá dùn, tí gbogbo ápù sì jẹ́ èso, ṣé a lè parí wí pé àwọn ápù kan dùn? Dáhùn pẹ̀lú bẹ́ẹ̀ni tàbí bẹ́ẹ̀kọ́. Dá bẹ́ẹ̀ni tàbí bẹ́ẹ̀kọ́ padà nìkan.",
     "gold_answer": "no",
-    "scoreable": true
+    "scoreable": true,
+    "task_zh": "如果有些水果是甜的,所有苹果都是水果,能否得出有些苹果是甜的?只回答“是”或“否”。"
   },
   {
     "pair_id": "fact_001",
@@ -149,7 +167,8 @@
     "task_en": "How many degrees are in a right angle? Return only the number.",
     "task_yo": "Igun amúdọ́gba ní dígírì mélòó? Dá nọ́mbà náà padà nìkan.",
     "gold_answer": "90",
-    "scoreable": true
+    "scoreable": true,
+    "task_zh": "直角是多少度?只返回数字。"
   },
   {
     "pair_id": "fact_002",
@@ -157,7 +176,8 @@
     "task_en": "What is the chemical symbol for oxygen? Return only the symbol.",
     "task_yo": "Kí ni àmì kẹ́míkà fún óksíjìn? Dá àmì náà padà nìkan.",
     "gold_answer": "O",
-    "scoreable": true
+    "scoreable": true,
+    "task_zh": "氧的化学符号是什么?只返回符号。"
   },
   {
     "pair_id": "fact_003",
@@ -165,7 +185,8 @@
     "task_en": "How many minutes are in one hour? Return only the number.",
     "task_yo": "Ìṣẹ́jú mélòó ni ó wà nínú wákàtí kan? Dá nọ́mbà náà padà nìkan.",
     "gold_answer": "60",
-    "scoreable": true
+    "scoreable": true,
+    "task_zh": "一小时有多少分钟?只返回数字。"
   },
   {
     "pair_id": "fact_004",
@@ -173,7 +194,8 @@
     "task_en": "What is the freezing point of water in Celsius? Return only the number.",
     "task_yo": "Ní Sẹ́lísíọ̀sì, ìwọ̀n òtútù mélòó ni omi máa ń di yìnyín sí? Dá nọ́mbà náà padà nìkan.",
     "gold_answer": "0",
-    "scoreable": true
+    "scoreable": true,
+    "task_zh": "水的冰点是多少摄氏度?只返回数字。"
   },
   {
     "pair_id": "fact_005",
@@ -181,7 +203,8 @@
     "task_en": "How many sides does a hexagon have? Return only the number.",
     "task_yo": "Ìhà mélòó ni onígun mẹ́fà ní? Dá nọ́mbà náà padà nìkan.",
     "gold_answer": "6",
-    "scoreable": true
+    "scoreable": true,
+    "task_zh": "六边形有多少条边?只返回数字。"
   },
   {
     "pair_id": "fact_006",
@@ -189,7 +212,8 @@
     "task_en": "What is the chemical symbol for gold? Return only the symbol.",
     "task_yo": "Kí ni àmì kẹ́míkà fún wúrà? Dá àmì náà padà nìkan.",
     "gold_answer": "Au",
-    "scoreable": true
+    "scoreable": true,
+    "task_zh": "金的化学符号是什么?只返回符号。"
   },
   {
     "pair_id": "text_001",
@@ -197,7 +221,8 @@
     "task_en": "Rewrite this sentence to be more polite: Send me the report now.",
     "task_yo": "Tún gbólóhùn yìí ṣe kí ó lè jẹ́ ọ̀wọ̀ jùlọ: Fi ìròyìn náà ránṣẹ́ sí mi báyìí.",
     "gold_answer": null,
-    "scoreable": false
+    "scoreable": false,
+    "task_zh": "将这句话改写得更礼貌一些:Send me the report now."
   },
   {
     "pair_id": "text_002",
@@ -205,7 +230,8 @@
     "task_en": "Rewrite this sentence to sound more formal: I can't come to the meeting today.",
     "task_yo": "Tún gbólóhùn yìí ṣe kí ó lè dún ní ọ̀nà oníṣẹ́ jùlọ: Èmi kò lè wá sí ìpàdé náà lónìí.",
     "gold_answer": null,
-    "scoreable": false
+    "scoreable": false,
+    "task_zh": "将这句话改写得更正式一些:I can't come to the meeting today."
   },
   {
     "pair_id": "text_003",
@@ -213,7 +239,8 @@
     "task_en": "Turn this statement into a question: The train arrives at nine.",
     "task_yo": "Sọ gbólóhùn yìí di ìbéèrè: Ọkọ̀ ojú irin náà máa dé ní agogo mẹ́sàn-án.",
     "gold_answer": null,
-    "scoreable": false
+    "scoreable": false,
+    "task_zh": "将这个陈述句改写为疑问句:The train arrives at nine."
   },
   {
     "pair_id": "text_004",
@@ -221,7 +248,8 @@
     "task_en": "Rewrite this instruction to sound like a gentle request: Close the window immediately.",
     "task_yo": "Tún ìtọ́ni yìí ṣe kí ó dà bí ìbéèrè oníjẹ̀lẹ́ńtì: Ti fèrèsé náà lẹ́ẹ̀kan náà.",
     "gold_answer": null,
-    "scoreable": false
+    "scoreable": false,
+    "task_zh": "将这条指令改写成温和的请求语气:Close the window immediately."
   },
   {
     "pair_id": "text_005",
@@ -229,7 +257,8 @@
     "task_en": "Rewrite this sentence to sound more encouraging: You did not finish the assignment.",
     "task_yo": "Tún gbólóhùn yìí ṣe kí ó lè fún ni ní ìsúra jùlọ: O ò parí iṣẹ́ àṣetúnṣe náà.",
     "gold_answer": null,
-    "scoreable": false
+    "scoreable": false,
+    "task_zh": "将这句话改写得更具鼓励性:You did not finish the assignment."
   },
   {
     "pair_id": "text_006",
@@ -237,6 +266,7 @@
     "task_en": "Combine these two sentences into one sentence: She opened the door. She walked inside.",
     "task_yo": "So àwọn gbólóhùn méjì yìí pọ̀ di ọ̀kan: Ó ṣí ilẹ̀kùn. Ó wọlé.",
     "gold_answer": null,
-    "scoreable": false
+    "scoreable": false,
+    "task_zh": "将下面两句话合并成一句话:She opened the door. She walked inside."
   }
 ]

@@ -103,6 +103,11 @@ BANNED_WORDS_BY_LANGUAGE = {
     # best-effort AI guess at how those borrowed terms would be spelled, not a
     # confirmed native-speaker spelling -- revisit once real Yorùbá wrapper text
     # exists and we see what spelling it actually uses (see report to researcher).
+    # Machine-translated Chinese terms; structurally audited, not native-speaker certified.
+    "zh": [
+        "测试", "测验", "考试", "考核", "评估",
+        "基准", "benchmark", "quiz", "grade", "score",
+    ],
     "yo": [
         "ìdánwò", "idanwo",
         "àdánwò", "adanwo",
