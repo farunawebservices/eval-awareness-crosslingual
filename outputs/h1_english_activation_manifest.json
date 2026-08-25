@@ -1,0 +1,51 @@
+{
+  "activation_storage_dtype": "torch.float32",
+  "block_indices_used": [
+    12,
+    16,
+    20,
+    24
+  ],
+  "device": "cuda:0",
+  "dtype": "torch.bfloat16",
+  "elapsed_seconds": 8.69,
+  "hidden_size": 3584,
+  "hidden_states_equivalent_indices": [
+    13,
+    17,
+    21,
+    25
+  ],
+  "input_path": "/workspace/eval-awareness-crosslingual/experiments/h1_clean_pilot/h1_70_cores_with_splits.jsonl",
+  "input_sha256": "9da1141d85f54d23214d03438d1f31e537b31e2f0358d636ad3dcffbd4d0fe76",
+  "label_counts": {
+    "0": 140,
+    "1": 140
+  },
+  "label_map": {
+    "deploy_mcq": 0,
+    "deploy_prose": 0,
+    "eval_mcq": 1,
+    "eval_prose": 1
+  },
+  "layer_index_convention": "Requested layer L maps to the 0-based Qwen block model.model.layers[L]; the hook captures that block's output (post-block residual stream), equivalent to output_hidden_states[L+1].",
+  "manifest_path": "/workspace/eval-awareness-crosslingual/outputs/h1_english_activation_manifest.json",
+  "max_prompt_tokens": 2048,
+  "model_name": "Qwen/Qwen2.5-7B-Instruct",
+  "num_layers": 28,
+  "output_path": "/workspace/eval-awareness-crosslingual/outputs/h1_english_activations.pt",
+  "pooling": "mean over non-padding prompt tokens (attention_mask == 1)",
+  "python_version": "3.12.3",
+  "record_count": 280,
+  "requested_layers": [
+    12,
+    16,
+    20,
+    24
+  ],
+  "step": "1a_english_activation_extraction_h1",
+  "timestamp_utc": "2026-08-25T22:13:16Z",
+  "torch_version": "2.5.1+cu121",
+  "truncation": "disabled (errors instead of truncating)",
+  "used_chat_template": false
+}
