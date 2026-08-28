@@ -1,0 +1,33 @@
+{
+  "manifest_keys": [
+    "prompts",
+    "layers"
+  ],
+  "n_prompts": 700,
+  "layers": [
+    12,
+    16,
+    20,
+    24
+  ],
+  "split_counts": {
+    "val": 150,
+    "test": 200,
+    "train": 350
+  },
+  "label_counts": {
+    "1": 350,
+    "0": 350
+  },
+  "n_cores": 70,
+  "rows_per_core": {
+    "10": 70
+  },
+  "inconsistent_core_count": 0,
+  "core_split_counts": {
+    "val": 15,
+    "test": 20,
+    "train": 35
+  },
+  "row_mismatch_count": 0
+}

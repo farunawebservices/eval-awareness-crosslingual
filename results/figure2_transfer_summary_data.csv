@@ -1,0 +1,4 @@
+language,transfer_auroc,native_auroc,transfer_gap,best_transfer_layer,best_native_layer,n_test
+Chinese,0.771875,0.9925,0.22062500000000007,12,12,80
+Arabic,0.863125,0.99625,0.13312499999999994,16,12,80
+Yorùbá,0.45275,1.0,0.54725,24,12,200

@@ -1,0 +1,100 @@
+{
+  "description": "Independent zero-shot transfer reproduction. The source logistic-regression probe is trained only on English training activations at layer 16; no target-language examples are used by the source probe.",
+  "target_name": "arabic",
+  "english_training": {
+    "source_artifact": "outputs/h1_english_activations.pt",
+    "source_layer": 16,
+    "n_rows": 280,
+    "split_counts": {
+      "train": 140,
+      "val": 60,
+      "test": 80
+    },
+    "train_label_counts": {
+      "0": 70,
+      "1": 70
+    },
+    "core_split_audit": {
+      "n_unique_cores": 70,
+      "core_split_counts": {
+        "train": 35,
+        "val": 15,
+        "test": 20
+      },
+      "n_cores_with_multiple_splits": 0
+    },
+    "coefficient_shape": [
+      1,
+      3584
+    ]
+  },
+  "target_artifact": {
+    "path": "outputs/h2_arabic_activations_4layers.pt",
+    "manifest": null,
+    "layout": "stacked_by_layer",
+    "n_rows": 280,
+    "split_row_counts": {
+      "train": 140,
+      "val": 60,
+      "test": 80
+    },
+    "test_label_counts": {
+      "0": 40,
+      "1": 40
+    },
+    "core_split_audit": {
+      "n_unique_cores": 70,
+      "core_split_counts": {
+        "train": 35,
+        "val": 15,
+        "test": 20
+      },
+      "n_cores_with_multiple_splits": 0
+    }
+  },
+  "english_to_target": {
+    "layer_12": {
+      "test_auroc": 0.830625,
+      "test_balanced_acc_at_0_5": 0.5375
+    },
+    "layer_16": {
+      "test_auroc": 0.863125,
+      "test_balanced_acc_at_0_5": 0.5875
+    },
+    "layer_20": {
+      "test_auroc": 0.788125,
+      "test_balanced_acc_at_0_5": 0.6
+    },
+    "layer_24": {
+      "test_auroc": 0.8228125,
+      "test_balanced_acc_at_0_5": 0.5125
+    }
+  },
+  "native_target": {
+    "layer_12": {
+      "val_auroc": 0.9988888888888889,
+      "test_auroc": 0.99625,
+      "test_balanced_acc_at_0_5": 0.9624999999999999
+    },
+    "layer_16": {
+      "val_auroc": 1.0,
+      "test_auroc": 0.995,
+      "test_balanced_acc_at_0_5": 0.95
+    },
+    "layer_20": {
+      "val_auroc": 0.9822222222222222,
+      "test_auroc": 0.99,
+      "test_balanced_acc_at_0_5": 0.95
+    },
+    "layer_24": {
+      "val_auroc": 0.9677777777777777,
+      "test_auroc": 0.98375,
+      "test_balanced_acc_at_0_5": 0.95
+    }
+  },
+  "best_transfer_layer": 16,
+  "best_transfer_auroc": 0.863125,
+  "best_native_layer": 12,
+  "best_native_auroc": 0.99625,
+  "transfer_gap": 0.13312499999999994
+}

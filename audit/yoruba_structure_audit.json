@@ -1,0 +1,26 @@
+{
+  "n_rows": 700,
+  "n_cores": 70,
+  "rows_per_core": {
+    "10": 70
+  },
+  "format_counts": {
+    "F1_eval_prose": 70,
+    "F3_eval_prose": 70,
+    "F5_eval_prose": 70,
+    "F1_deploy_prose": 70,
+    "F3_deploy_prose": 70,
+    "F5_deploy_prose": 70,
+    "F2_eval_mcq": 70,
+    "F4_eval_mcq": 70,
+    "F2_deploy_mcq": 70,
+    "F4_deploy_mcq": 70
+  },
+  "families": [
+    "F1",
+    "F2",
+    "F3",
+    "F4",
+    "F5"
+  ]
+}

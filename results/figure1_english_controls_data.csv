@@ -1,0 +1,6 @@
+method,auroc
+Activation probe,0.995
+Character TF-IDF,0.9619
+Random vector,0.6219
+Prompt length,0.4869
+Majority baseline,0.5
