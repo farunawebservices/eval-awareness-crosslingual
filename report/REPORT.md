@@ -25,7 +25,7 @@ I studied this question in Qwen2.5-7B-Instruct. I built controlled prompt pairs 
 
 2. **The activation signal generalizes beyond the original exact phrases.** I replaced every original wrapper on the same 80 held-out English tasks with one of five unseen, balanced evaluation/deployment wrapper pairs. Both models remained frozen after training on the original English training split. The activation probe retained AUROC 0.874, while TF-IDF fell to 0.626 and a length baseline stayed at chance at 0.498. Thus, the activation signal is not limited to memorizing the original wrapper text. However, the new wrappers still explicitly describe formal scoring or ordinary use, so this is evidence for out-of-template semantic generalization—not proof of hidden evaluation awareness.
 
-![Figure 4. Out-of-template generalization](../figures/figure4_out_of_template_generalization.png)
+![Figure 1. Out-of-template English framing test](../figures/figure4_out_of_template_generalization.png)
 
 **Figure 1. Out-of-template English framing test.** Both probes were trained only on original English training prompts. Replacing every test wrapper with one of five unseen balanced wrapper pairs reduces both scores, but the activation probe retains substantially more discrimination than TF-IDF: 0.874 versus 0.626.
 
