@@ -27,7 +27,7 @@ I studied this question in Qwen2.5-7B-Instruct. I built controlled prompt pairs 
 
 ![Figure 1. Out-of-template English framing test](../figures/figure4_out_of_template_generalization.png)
 
-**Figure 1. Out-of-template English framing test.** Both probes were trained only on original English training prompts. Replacing every test wrapper with one of five unseen balanced wrapper pairs reduces both scores, but the activation probe retains substantially more discrimination than TF-IDF: 0.874 versus 0.626.
+**Figure 1. Out-of-template English framing test.** Both models were trained only on the original 140 English training prompts. On the same 80 held-out semantic tasks, I replaced every original wrapper with one of five balanced unseen evaluation/deployment wrapper pairs. The activation probe retained AUROC 0.874, compared with 0.626 for character TF-IDF.
 
 3. **Cross-lingual transfer is real but not universal.** A fixed English layer-16 probe reached AUROC 0.772 on Chinese and 0.863 on Arabic. It failed on Yorùbá, reaching 0.453 at its best layer, while native probes were near-perfect in all three target languages.
 
