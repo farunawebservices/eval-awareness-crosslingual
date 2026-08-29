@@ -1,0 +1,4 @@
+method,original_template_auroc,unseen_template_auroc,drop
+Activation probe,0.995,0.87375,0.12124999999999997
+Character TF-IDF,0.9619,0.625625,0.336275
+Prompt length,0.4869,0.4984375,-0.011537499999999978
